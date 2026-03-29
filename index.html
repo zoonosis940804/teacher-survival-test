@@ -132,18 +132,6 @@ body {
 @keyframes heroFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 .empty-section h3 { font-family:'Gaegu',cursive; font-size:1.4rem; margin-bottom:8px; }
 .empty-section p { color:var(--text-dim); font-size:0.88rem; line-height:1.7; }
-.guide-box { display:inline-block; margin-top:24px; padding:14px 28px; border-radius:var(--radius-sm); background:rgba(80,240,192,0.06); border:1px solid rgba(80,240,192,0.18); text-align:left; }
-.guide-box .guide-title { font-size:0.72rem; font-weight:700; color:var(--mint); letter-spacing:0.5px; margin-bottom:8px; }
-.guide-box code { font-size:0.82rem; color:var(--text-mid); background:rgba(0,0,0,0.25); padding:2px 8px; border-radius:6px; font-family:'Courier New',monospace; }
-
-/* ── Guide Cards ── */
-.guide-section { margin-top:52px; }
-.guide-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
-.guide-card { background:var(--bg-card); backdrop-filter:blur(12px); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:20px 18px; }
-.guide-card .g-icon { font-size:24px; margin-bottom:10px; }
-.guide-card h3 { font-size:0.88rem; font-weight:700; color:var(--sky); margin-bottom:6px; }
-.guide-card p { font-size:0.78rem; color:var(--text-dim); line-height:1.65; }
-.guide-card code { font-size:0.75rem; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px; color:var(--mint); }
 
 /* ── Footer ── */
 footer { margin-top:64px; text-align:center; padding:28px 0 12px; border-top:1px solid rgba(96,176,244,0.08); }
@@ -157,10 +145,6 @@ footer .heart { color:var(--rose); }
   .cards-grid { grid-template-columns:1fr; }
   .stat-row { gap:10px; }
   .stat-pill { font-size:0.8rem; padding:8px 14px; }
-  .guide-grid { grid-template-columns:1fr 1fr; }
-}
-@media (max-width:400px) {
-  .guide-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -196,8 +180,6 @@ footer .heart { color:var(--rose); }
     </p>
     <div class="stat-row">
       <div class="stat-pill"><i class="fas fa-list-check"></i> 시리즈 <span class="val" id="statTotal">탐색 중...</span></div>
-      <div class="stat-pill"><i class="fas fa-question-circle"></i> 문항 수 <span class="val">12문항 통일</span></div>
-      <div class="stat-pill"><i class="fas fa-users"></i> 대상 <span class="val">전국 초등교사</span></div>
     </div>
   </section>
 
@@ -214,64 +196,20 @@ footer .heart { color:var(--rose); }
     <div class="empty-section" id="emptySection" style="display:none;">
       <span class="empty-emoji">📭</span>
       <h3>아직 등록된 테스트가 없어요!</h3>
-      <p>같은 폴더에 <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;color:var(--mint);">test1.html</code>을 올리면<br>자동으로 여기에 나타날 거예요. ✨</p>
-      <div class="guide-box">
-        <div class="guide-title">📁 파일명 규칙</div>
-        <p style="font-size:0.8rem;color:var(--text-mid);margin-top:4px;">
-          <code>test1.html</code>, <code>test2.html</code>, ... <code>test30.html</code>
-        </p>
-      </div>
+      <p>곧 새로운 테스트가 올라올 예정이에요. 조금만 기다려주세요. ✨</p>
     </div>
   </section>
 
-  <section class="guide-section">
-    <div class="section-label">
-      <h2>🛠️ 선생님 사용 설명서</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div class="guide-grid">
-      <div class="guide-card">
-        <div class="g-icon">📁</div>
-        <h3>파일 규칙</h3>
-        <p>새 테스트는 <code>test1.html</code> 형식으로 저장하세요. 번호 순서대로 자동 탐색합니다.</p>
-      </div>
-      <div class="guide-card">
-        <div class="g-icon">⚡</div>
-        <h3>자동 반영</h3>
-        <p>파일 업로드 후 새로고침만 하면 카드가 자동 생성됩니다. 코드 수정은 전혀 불필요해요!</p>
-      </div>
-      <div class="guide-card">
-        <div class="g-icon">✏️</div>
-        <h3>제목 커스텀</h3>
-        <p>JS 코드 상단의 <code>TEST_META</code> 객체에 제목·설명·이모지를 추가하면 카드에 반영돼요.</p>
-      </div>
-      <div class="guide-card">
-        <div class="g-icon">🎨</div>
-        <h3>디자인 통일</h3>
-        <p>각 테스트는 Glassmorphism 테마, 12문항 구조를 유지하면 시리즈가 완성돼요!</p>
-      </div>
-    </div>
-  </section>
 
   <footer>
     <p>
-      <span class="heart">♥</span> 선생님들의 퇴근 후 5분을 책임지는 힐링 테스트 시리즈<br>
-      <span style="opacity:0.4;">GitHub Pages + 정적 HTML · 광고 없음 · 데이터 수집 없음</span>
+      <span class="heart">♥</span> 선생님들의 퇴근 후 5분을 책임지는 힐링 테스트 시리즈
     </p>
   </footer>
 
 </div>
 
 <script>
-/*
- * ──────────────────────────────────────────
- * 📋  TEST_META: 테스트 카드 메타데이터
- * ──────────────────────────────────────────
- * 새 테스트를 추가할 때 이 객체에 번호를 키로 등록하세요.
- * 등록하지 않아도 기본 디자인으로 자동 생성됩니다.
- *
- * colorA / colorB : 카드 강조 색상 (CSS 색상값)
- * ────────────────────────────────────────── */
 const TEST_META = {
   1: {
     title: "초등교사 MBTI",
@@ -294,16 +232,6 @@ const TEST_META = {
     tags: ["업무유형", "캐릭터"],
     colorA: "#b090d8", colorB: "#ff7eb3"
   }
-  /*
-   * ← 여기에 계속 추가하세요! 예시:
-   * 4: {
-   *   title: "학기말 생존력 테스트",
-   *   desc: "...",
-   *   emoji: "🔥",
-   *   tags: ["학기말", "생존"],
-   *   colorA: "#50f0c0", colorB: "#60b0f4"
-   * },
-   */
 };
 
 /* 메타 미등록 시 순환 사용하는 기본 테마 */
@@ -320,14 +248,25 @@ const DEFAULT_THEMES = [
   { emoji:"🚀", colorA:"#60b0f4", colorB:"#b090d8" },
 ];
 
-/*
- * ──────────────────────────────────────────
- * 🔍  자동 탐색 설정
- * MAX_SCAN: 최대 탐색 번호 (기본 30)
- * STOP_ON_MISS: 연속 404 N번이면 탐색 중단
- * ────────────────────────────────────────── */
 const MAX_SCAN = 30;
 const STOP_ON_MISS = 3;
+
+function parseTitleFromHtml(html) {
+  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (!m) return null;
+  return m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+}
+
+function extractLeadingEmoji(str) {
+  if (!str) return null;
+  const m = str.match(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+  return m ? m[0] : null;
+}
+
+function stripLeadingEmoji(str) {
+  if (!str) return str;
+  return str.replace(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*/u, '').trim();
+}
 
 async function scanTests() {
   const found = [];
@@ -336,9 +275,11 @@ async function scanTests() {
   for (let i = 1; i <= MAX_SCAN; i++) {
     if (missCount >= STOP_ON_MISS) break;
     try {
-      const res = await fetch('test' + i + '.html', { method: 'HEAD' });
+      const res = await fetch('test' + i + '.html');
       if (res.ok) {
-        found.push(i);
+        const html = await res.text();
+        const rawTitle = parseTitleFromHtml(html);
+        found.push({ num: i, rawTitle: rawTitle });
         missCount = 0;
       } else {
         missCount++;
@@ -350,12 +291,18 @@ async function scanTests() {
   return found;
 }
 
-function createCard(num, delay) {
+function createCard(item, delay) {
+  const num = item.num;
+  const rawTitle = item.rawTitle;
   const meta = TEST_META[num];
   const theme = DEFAULT_THEMES[(num - 1) % DEFAULT_THEMES.length];
 
-  const emoji   = (meta && meta.emoji)  || theme.emoji;
-  const title   = (meta && meta.title)  || ('테스트 ' + num + '탄');
+  const emojiFromTitle = extractLeadingEmoji(rawTitle);
+  const emoji   = (meta && meta.emoji)  || emojiFromTitle || theme.emoji;
+
+  const titleFromFile = rawTitle ? stripLeadingEmoji(rawTitle) : null;
+  const title   = (meta && meta.title)  || titleFromFile || ('테스트 ' + num + '탄');
+
   const desc    = (meta && meta.desc)   || ('시리즈 ' + num + '탄에 도전해보세요! 당신의 교실 속 모습을 분석해드립니다.');
   const tags    = (meta && meta.tags)   || [num + '탄'];
   const colorA  = (meta && meta.colorA) || theme.colorA;
@@ -401,8 +348,8 @@ async function init() {
     } else {
       cardsGrid.style.display = 'grid';
       statTotal.textContent = found.length + '개 발견';
-      found.forEach(function(num, idx) {
-        cardsGrid.appendChild(createCard(num, idx));
+      found.forEach(function(item, idx) {
+        cardsGrid.appendChild(createCard(item, idx));
       });
     }
   } catch(err) {

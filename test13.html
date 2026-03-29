@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 월급날 자산 증식 DNA 검사</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0b1628;
+  --bg-mid: #111d35;
+  --bg-card: rgba(17,29,53,0.72);
+  --glass-border: rgba(230,57,70,0.18);
+  --glass-glow: rgba(230,57,70,0.06);
+  --red-hot: #e63946;
+  --navy: #002366;
+  --gold: #ffd54f;
+  --mint: #56ffc8;
+  --text-white: #eaf0f8;
+  --text-dim: rgba(234,240,248,0.5);
+  --text-mid: rgba(234,240,248,0.78);
+  --radius: 22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* ── Ambient BG ── */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 520px; height: 520px;
+  background: var(--red-hot);
+  opacity: 0.12;
+  top: -8%; right: -8%;
+  animation: orbA 22s ease-in-out infinite;
+}
+
+body::after {
+  width: 480px; height: 480px;
+  background: var(--navy);
+  opacity: 0.09;
+  bottom: -10%; left: -10%;
+  animation: orbB 26s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(-12vw, 18vh); }
+  66% { transform:translate(-6vw, 8vh); }
+}
+@keyframes orbB {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(14vw, -12vh); }
+  66% { transform:translate(8vw, -4vh); }
+}
+
+/* Blueprint grid */
+.grid-bg {
+  position: fixed; inset:0; z-index:0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(230,57,70,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230,57,70,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Sound Toggle ── */
+.sound-toggle {
+  position: fixed; top:18px; left:18px; z-index:500;
+  width:48px; height:48px; border-radius:50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(230,57,70,0.08);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 28px rgba(230,57,70,0.15);
+}
+
+.sound-toggle .icon-on,
+.sound-toggle .icon-off {
+  position: absolute;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute; left:56px; top:50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.7);
+  color: var(--red-hot);
+  font-size: 0.72rem; font-weight:500;
+  padding: 5px 10px; border-radius:8px;
+  white-space: nowrap;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.2s;
+}
+
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+/* ── App ── */
+.app-container {
+  position: relative; z-index:1;
+  width: 100%; max-width: 700px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(230,57,70,0.06);
+  padding: 40px 32px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── Start ── */
+.start-screen { text-align:center; }
+
+.start-screen .emoji-hero {
+  font-size:72px; margin-bottom:14px;
+  display:inline-block;
+  animation: heroFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-14px) rotate(3deg); }
+}
+
+.start-screen h1 {
+  font-family:'Gaegu',cursive;
+  font-size:2.2rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.35; margin-bottom:6px;
+}
+
+.start-screen h1 span {
+  background: linear-gradient(90deg, var(--red-hot), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.series-tag {
+  display:inline-block;
+  padding:4px 14px; border-radius:20px;
+  background: rgba(230,57,70,0.1);
+  border:1px solid rgba(230,57,70,0.25);
+  color: var(--red-hot);
+  font-size:0.75rem; font-weight:700;
+  margin-bottom:16px; letter-spacing:0.5px;
+}
+
+.start-screen .sub {
+  font-size:0.92rem;
+  color: var(--text-mid);
+  line-height:1.7; margin-bottom:32px;
+}
+
+.start-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 52px; border:none; border-radius:50px;
+  background: linear-gradient(135deg, var(--red-hot), #ff6b7a);
+  color: #fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.15rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow: 0 6px 28px rgba(230,57,70,0.25);
+  position:relative; overflow:hidden;
+}
+
+.start-btn::after {
+  content:''; position:absolute;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform:translateX(-100%) rotate(25deg); }
+  100% { transform:translateX(100%) rotate(25deg); }
+}
+
+.start-btn:hover {
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 12px 36px rgba(230,57,70,0.35);
+}
+
+/* ── Progress ── */
+.progress-wrap { width:100%; margin-bottom:22px; }
+
+.progress-info {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+
+.progress-info .q-num {
+  font-family:'Gaegu',cursive;
+  font-size:1.2rem; font-weight:700;
+  color: var(--red-hot);
+}
+
+.progress-info .q-count {
+  font-size:0.85rem; color:var(--text-dim); font-weight:500;
+}
+
+.progress-bar-bg {
+  width:100%; height:10px;
+  background: rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden;
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--red-hot), var(--gold));
+  border-radius:10px;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+/* ── Question ── */
+.question-section { animation: fadeSlide 0.45s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(36px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
+.question-text {
+  font-size:1.06rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.7; margin-bottom:24px;
+  word-break:keep-all;
+}
+
+.question-text .q-emoji {
+  display:inline-block; margin-right:6px; font-size:1.3rem;
+}
+
+/* ── Answers ── */
+.answers-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+
+.answer-btn {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:14px 15px;
+  border:1.5px solid rgba(230,57,70,0.1);
+  border-radius:16px;
+  background:rgba(255,255,255,0.03);
+  cursor:pointer; transition:all 0.22s ease;
+  text-align:left;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.84rem; color:var(--text-mid);
+  line-height:1.55; word-break:keep-all;
+}
+
+.answer-btn .num-badge {
+  flex-shrink:0; width:26px; height:26px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--red-hot), var(--gold));
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700;
+  margin-top:1px;
+}
+
+.answer-btn:hover {
+  background:rgba(230,57,70,0.08);
+  border-color:var(--red-hot);
+  transform:translateY(-2px);
+  box-shadow:0 4px 18px rgba(230,57,70,0.1);
+  color:var(--text-white);
+}
+
+.answer-btn:active { transform:scale(0.97); }
+
+.answer-btn.picked {
+  background:rgba(230,57,70,0.1);
+  border-color:var(--red-hot);
+  box-shadow:0 0 18px rgba(230,57,70,0.12);
+  color:var(--red-hot);
+  pointer-events:none;
+}
+
+/* ── Result ── */
+.result-screen {
+  text-align:center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.8) translateY(28px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.res-emoji {
+  font-size:84px; display:inline-block; margin-bottom:12px;
+  animation: emojiDance 1.2s ease-in-out infinite;
+}
+
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.12) rotate(-6deg); }
+  75% { transform:scale(1.12) rotate(6deg); }
+}
+
+.chart-bar {
+  display:inline-block; margin:0 4px;
+  width:3px;
+  background: linear-gradient(180deg, var(--red-hot), var(--gold));
+  animation: chartRise 0.8s cubic-bezier(.23,1,.32,1) both;
+}
+
+.chart-bar:nth-child(1) { height:20px; animation-delay:0.1s; }
+.chart-bar:nth-child(2) { height:35px; animation-delay:0.2s; }
+.chart-bar:nth-child(3) { height:28px; animation-delay:0.3s; }
+.chart-bar:nth-child(4) { height:42px; animation-delay:0.4s; }
+.chart-bar:nth-child(5) { height:38px; animation-delay:0.5s; }
+
+@keyframes chartRise {
+  from { height:0; }
+}
+
+.res-type-badge {
+  display:inline-block;
+  padding:10px 36px; border-radius:50px;
+  font-family:'Gaegu',cursive;
+  font-size:1.6rem; font-weight:700;
+  margin-bottom:8px;
+}
+
+.type-A { background:linear-gradient(135deg, #64b5f6, #42a5f5); color:#fff; }
+.type-B { background:linear-gradient(135deg, var(--red-hot), #ff6b7a); color:#fff; }
+.type-C { background:linear-gradient(135deg, #9575cd, #7e57c2); color:#fff; }
+.type-D { background:linear-gradient(135deg, #4db8a8, #26a69a); color:#fff; }
+.type-E { background:linear-gradient(135deg, var(--gold), #ffca28); color:var(--bg-deep); }
+.type-F { background:linear-gradient(135deg, #ef9a9a, #e57373); color:#fff; }
+
+.res-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.3rem; font-weight:700;
+  color:var(--red-hot); margin-bottom:8px;
+}
+
+.res-desc {
+  font-size:0.92rem; color:var(--text-mid);
+  line-height:1.85; margin-bottom:18px;
+  word-break:keep-all; padding:0 6px;
+}
+
+.res-info-row {
+  display:flex; gap:12px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:28px;
+}
+
+.res-info-box {
+  flex:1; min-width:200px; max-width:280px;
+  padding:14px 18px; border-radius:16px;
+  text-align:left;
+}
+
+.res-info-box.money-box {
+  background:rgba(230,57,70,0.08);
+  border:1px solid rgba(230,57,70,0.2);
+}
+
+.res-info-box.strategy-box {
+  background:rgba(255,212,79,0.08);
+  border:1px solid rgba(255,212,79,0.2);
+}
+
+.info-label {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.5px; margin-bottom:4px;
+}
+
+.money-box .info-label { color:var(--red-hot); }
+.strategy-box .info-label { color:var(--gold); }
+
+.info-value {
+  font-size:0.88rem; font-weight:700;
+  color:var(--text-white); line-height:1.5;
+}
+
+/* Score Bars */
+.score-section {
+  margin-bottom:28px; text-align:left;
+}
+
+.score-section h3 {
+  font-size:0.85rem; font-weight:700;
+  color:var(--text-mid); margin-bottom:14px;
+  text-align:center;
+}
+
+.bar-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+
+.bar-label {
+  font-size:0.75rem; font-weight:700;
+  color:var(--text-dim); min-width:62px; text-align:right;
+}
+
+.bar-track {
+  flex:1; height:16px;
+  background:rgba(255,255,255,0.05);
+  border-radius:10px; overflow:hidden;
+}
+
+.bar-fill {
+  height:100%; border-radius:10px;
+  transition: width 1.1s cubic-bezier(.23,1,.32,1);
+  width:0;
+}
+
+.bf-A { background:linear-gradient(90deg, #64b5f6, #42a5f5); }
+.bf-B { background:linear-gradient(90deg, var(--red-hot), #ff6b7a); }
+.bf-C { background:linear-gradient(90deg, #9575cd, #7e57c2); }
+.bf-D { background:linear-gradient(90deg, #4db8a8, #26a69a); }
+.bf-E { background:linear-gradient(90deg, var(--gold), #ffca28); }
+.bf-F { background:linear-gradient(90deg, #ef9a9a, #e57373); }
+
+.bar-pts {
+  font-size:0.78rem; font-weight:700;
+  color:var(--text-dim); min-width:28px;
+}
+
+/* ── Action Buttons ── */
+.result-actions {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+
+.save-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--red-hot), #ff6b7a);
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(230,57,70,0.3);
+}
+
+.save-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(230,57,70,0.45);
+}
+
+.save-btn.saving { pointer-events:none; opacity:0.7; }
+
+.retry-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--navy), #003d82);
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(0,35,102,0.3);
+}
+
+.retry-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(0,35,102,0.4);
+}
+
+/* ── Capture Card ── */
+.capture-card {
+  position:fixed; left:-9999px; top:0;
+  width:600px; padding:48px 40px 40px;
+  border-radius:28px;
+  font-family:'Noto Sans KR',sans-serif;
+  text-align:center; z-index:-1;
+}
+
+.capture-card .cap-wm {
+  font-size:0.68rem; color:rgba(234,240,248,0.35);
+  margin-top:18px; letter-spacing:1px;
+}
+
+.capture-card .cap-emoji { font-size:68px; margin-bottom:10px; }
+
+.capture-card .cap-chart {
+  display:inline-block; margin-bottom:14px;
+  height:40px; display:flex; align-items:flex-end; gap:2px;
+}
+
+.capture-card .cap-bar {
+  width:4px; background:linear-gradient(180deg, var(--red-hot), var(--gold));
+  border-radius:2px;
+}
+
+.capture-card .cap-badge {
+  display:inline-block; padding:8px 30px; border-radius:50px;
+  font-family:'Gaegu',cursive;
+  font-size:1.5rem; font-weight:700;
+  margin-bottom:10px;
+}
+
+.capture-card .cap-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.2rem; font-weight:700;
+  color:var(--red-hot); margin-bottom:10px;
+}
+
+.capture-card .cap-desc {
+  font-size:0.84rem; color:rgba(234,240,248,0.78);
+  line-height:1.8; word-break:keep-all;
+  margin-bottom:16px; padding:0 10px;
+}
+
+.capture-card .cap-info-row {
+  display:flex; gap:10px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:8px;
+}
+
+.capture-card .cap-info-box {
+  flex:1; min-width:180px; max-width:250px;
+  padding:10px 14px; border-radius:12px;
+  text-align:left;
+}
+
+.capture-card .cap-money {
+  background:rgba(230,57,70,0.12);
+  border:1px solid rgba(230,57,70,0.25);
+}
+
+.capture-card .cap-strategy {
+  background:rgba(255,212,79,0.12);
+  border:1px solid rgba(255,212,79,0.25);
+}
+
+.capture-card .cap-il {
+  font-size:0.65rem; font-weight:700;
+  margin-bottom:2px; letter-spacing:0.5px;
+}
+
+.capture-card .cap-money .cap-il { color:var(--red-hot); }
+.capture-card .cap-strategy .cap-il { color:var(--gold); }
+
+.capture-card .cap-iv {
+  font-size:0.82rem; font-weight:700;
+  color:#fff; line-height:1.5;
+}
+
+.capture-card .cap-bars { text-align:left; margin-top:16px; }
+
+.capture-card .cap-br {
+  display:flex; align-items:center; gap:6px; margin-bottom:5px;
+}
+
+.capture-card .cap-bl {
+  font-size:0.68rem; font-weight:700;
+  color:rgba(234,240,248,0.45); min-width:56px; text-align:right;
+}
+
+.capture-card .cap-bt {
+  flex:1; height:12px;
+  background:rgba(255,255,255,0.08);
+  border-radius:6px; overflow:hidden;
+}
+
+.capture-card .cap-bf {
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg, var(--red-hot), var(--gold));
+}
+
+.capture-card .cap-bp {
+  font-size:0.68rem; font-weight:700;
+  color:rgba(234,240,248,0.45); min-width:24px;
+}
+
+/* ── Confetti ── */
+.confetti-box {
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none; z-index:999; overflow:hidden;
+}
+
+.confetti-dot {
+  position:absolute; top:-20px; border-radius:3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Deco ── */
+.deco {
+  position:fixed; font-size:26px; opacity:0.06;
+  pointer-events:none; z-index:0;
+  animation: decoD 14s ease-in-out infinite;
+}
+
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-16px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+/* ── Responsive ── */
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:28px 18px; }
+  .start-screen h1 { font-size:1.65rem; }
+  .start-screen .emoji-hero { font-size:56px; }
+  .question-text { font-size:0.96rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.88rem; padding:13px 14px; }
+  .res-emoji { font-size:64px; }
+  .res-type-badge { font-size:1.3rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction:column; align-items:center; }
+  .res-info-row { flex-direction:column; align-items:center; }
+  .res-info-box { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<div class="deco" style="top:5%;left:6%;animation-delay:0s;">📈</div>
+<div class="deco" style="top:20%;right:5%;animation-delay:2s;">💰</div>
+<div class="deco" style="top:48%;left:2%;animation-delay:4s;">💳</div>
+<div class="deco" style="top:70%;right:4%;animation-delay:6s;">📊</div>
+<div class="deco" style="top:38%;left:92%;animation-delay:8s;">🏦</div>
+<div class="deco" style="top:85%;left:10%;animation-delay:3s;">💸</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">💰</div>
+      <h1>월급날<br><span>자산 증식 DNA</span></h1>
+      <div class="series-tag">교사 생존력 테스트 · 시리즈 13탄</div>
+      <p class="sub">공제회? 주식? 아, 월급 들어오는 순간 늘 같은 고민이네요.<br>당신은 어떤 재테크 성격일까요?<br>🧚 공제회파부터 🚀 주식 공격형까지, 6가지 금융 DNA 분석</p>
+      <button class="start-btn" onclick="beginQuiz()">돈 성격 분석하기 💡</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q1</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   🔊  Sound Engine
+   ═══════════════════════════════════════ */
+let audioCtx = null, soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) { tog.classList.remove('muted'); tip.textContent='효과음 ON'; playCoinSound(); }
+  else { tog.classList.add('muted'); tip.textContent='효과음 OFF'; }
+}
+
+/* 동전 떨어지는 소리 */
+function playCoinSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type='triangle';
+    o.frequency.setValueAtTime(1200, now);
+    o.frequency.exponentialRampToValueAtTime(800, now+0.08);
+    g.gain.setValueAtTime(0.1, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now+0.15);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(now); o.stop(now+0.15);
+  } catch(e){}
+}
+
+/* 주식 상승! 팡파레 */
+function playStockUpSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const notes = [
+      {f:523, s:0, d:0.12},
+      {f:659, s:0.1, d:0.12},
+      {f:784, s:0.2, d:0.12},
+      {f:1047, s:0.32, d:0.4}
+    ];
+    notes.forEach(n => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(n.f, now+n.s);
+      g.gain.setValueAtTime(0, now+n.s);
+      g.gain.linearRampToValueAtTime(0.2, now+n.s+0.02);
+      g.gain.setValueAtTime(0.2, now+n.s+n.d*0.6);
+      g.gain.exponentialRampToValueAtTime(0.001, now+n.s+n.d+0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now+n.s); o.stop(now+n.s+n.d+0.15);
+    });
+  } catch(e){}
+}
+
+/* ═══════════════════════════════════════
+   📝  Quiz Data — 12 Questions
+   ═══════════════════════════════════════ */
+const QS = [
+  {
+    e:"💵", q:"매달 17일(월급날) 아침, 입금 알림을 확인했을 때 나의 첫 소감은?",
+    a:[
+      {t:"A", txt:"\"이번 달도 무사히 공제회비가 빠져나갔군. 다행이다.\""},
+      {t:"B", txt:"\"이 시드머니로 지금 어떤 종목을 추매할까? 미장 열렸나?\""},
+      {t:"C", txt:"엑셀을 켜서 카드값, 저축액을 소수점까지 맞추며 자산 현황을 업데이트."},
+      {t:"D", txt:"\"은퇴까지 남은 월급 횟수를 계산하며 자유의 날을 꿈꾼다.\""},
+      {t:"E", txt:"\"기여금이랑 세금이 왜 이렇게 많이 나갔지?\" 명세서부터 뜯어본다."},
+      {t:"F", txt:"\"고생했다 나 자신! 일단 사고 싶었던 장바구니 아이템 결제!\""}
+    ]
+  },
+  {
+    e:"🏦", q:"교직원공제회 장기저축급여 증액 안내 문자가 왔다면?",
+    a:[
+      {t:"A", txt:"\"복리가 최고지!\" 고민 없이 바로 풀(Full) 증액 신청한다."},
+      {t:"B", txt:"\"그 돈 묶어두느니 내가 엔비디아나 비트코인 사서 10배 벌겠다.\""},
+      {t:"C", txt:"현재 공제회 이율과 시중 금리, 주식 기대 수익률을 비교해본다."},
+      {t:"D", txt:"미래의 나를 위해 일단 증액하지만, 현재 투자금이 줄어들어 조금 아쉽다."},
+      {t:"E", txt:"이게 나중에 연금저축이랑 비교해서 세제 혜택이 얼마나 유리한지 따져본다."},
+      {t:"F", txt:"\"문자가 왔었나?\" 읽고 바로 삭제한 뒤 카페인 수혈하러 간다."}
+    ]
+  },
+  {
+    e:"🎉", q:"성과급이나 명절 휴가비가 예상보다 더 많이 들어왔다면?",
+    a:[
+      {t:"A", txt:"\"없는 돈이라 치고 바로 비상금 적금 통장으로 보낸다.\""},
+      {t:"B", txt:"\"운명의 데스티니! 눈여겨보던 우량주나 유망 코인을 풀매수한다.\""},
+      {t:"C", txt:"자산 포트폴리오의 비중을 재조정(리밸런싱)하는 기회로 삼는다."},
+      {t:"D", txt:"파이어(FIRE) 자금에 보태서 은퇴 날짜를 한 달이라도 앞당긴다."},
+      {t:"E", txt:"IRP나 연금저축 계좌에 입금해서 내년 초 '13월의 월급'을 확보한다."},
+      {t:"F", txt:"고생한 나를 위한 보상으로 최신형 전자기기나 명품을 검색한다."}
+    ]
+  },
+  {
+    e:"📱", q:"동료 선생님이 \"요즘 이 주식(혹은 코인)이 대박이래!\"라고 속삭인다면?",
+    a:[
+      {t:"A", txt:"\"난 그런 거 무서워요. 원금 보장되는 예금이 최고야.\""},
+      {t:"B", txt:"\"오? 소스 굿!\" 대화 끝나자마자 관련 차트와 거래량부터 확인한다."},
+      {t:"C", txt:"재무제표나 백서, 공시 자료를 찾아보기 전까진 절대 믿지 않는다."},
+      {t:"D", txt:"나의 장기 우상향 투자 원칙에 어긋나면 쳐다보지도 않는다."},
+      {t:"E", txt:"\"그거 수익 나면 금융투자소득세는 어떻게 되는 거야?\"부터 묻는다."},
+      {t:"F", txt:"\"진짜? 나도 좀 사볼까?\" 하며 일단 묻지마 매수를 시전한다."}
+    ]
+  },
+  {
+    e:"📚", q:"나의 평소 경제 공부 스타일은?",
+    a:[
+      {t:"A", txt:"공부 안 함. 국가가 내 연금과 공제회를 지켜줄 거라 믿음."},
+      {t:"B", txt:"실시간 주식 카페, 텔레그램 뉴스레터, 코인 커뮤니티 탐독."},
+      {t:"C", txt:"경제 신문 구독과 거시 경제(매크로) 지표 분석."},
+      {t:"D", txt:"자산 관리 앱의 우상향 곡선을 보며 조기 은퇴 시나리오 짜기."},
+      {t:"E", txt:"연말정산 가이드와 절세 전략 유튜브 무한 반복 시청."},
+      {t:"F", txt:"인스타 핫플과 요즘 유행하는 신상 소비 트렌드 눈팅."}
+    ]
+  },
+  {
+    e:"😱", q:"밤늦게 미장(미국 주식)이나 코인 시장이 폭락했다는 뉴스를 봤다면?",
+    a:[
+      {t:"A", txt:"\"휴, 역시 주식 안 하길 잘했어.\" 안도의 한숨을 쉬며 숙면한다."},
+      {t:"B", txt:"\"줍줍 타이밍이다!\" 잠자던 가족 깨워서라도 매수 자금을 끌어모은다."},
+      {t:"C", txt:"하락 원인이 펀더멘탈 문제인지 단순 조정인지 냉철하게 분석한다."},
+      {t:"D", txt:"\"나의 경제적 자유가 1년 늦어지겠군...\" 담담하게 포트폴리오를 본다."},
+      {t:"E", txt:"\"손실 확정 시 세금 상계 처리가 가능한가?\"를 계산해본다."},
+      {t:"F", txt:"\"내 돈!!!\" 괴로워하며 야식을 시켜 먹고 스트레스를 푼다."}
+    ]
+  },
+  {
+    e:"☕", q:"점심시간(혹은 공강)에 동료들과 나누는 주된 재테크 대화는?",
+    a:[
+      {t:"A", txt:"\"선생님, 이번에 저축은행 파킹통장 금리 어디가 높대요?\""},
+      {t:"B", txt:"\"미장 테슬라랑 엔비디아 보셨어요? 국장은 역시 답이 없나...\""},
+      {t:"C", txt:"\"요즘 환율이랑 미국 국채 금리 추이가 심상치 않네요.\""},
+      {t:"D", txt:"\"우리 한 달에 얼마씩 모아야 50살 이전에 탈출(은퇴)할까요?\""},
+      {t:"E", txt:"\"신용카드랑 체크카드 비율 어떻게 섞어야 환급 많이 받죠?\""},
+      {t:"F", txt:"\"선생님, 그 옷 너무 예쁘다! 어디서 사셨어요?\""}
+    ]
+  },
+  {
+    e:"💸", q:"연말정산 시즌, '13월의 월급'을 대하는 나의 자세는?",
+    a:[
+      {t:"A", txt:"\"토해내지만 마라. 주는 대로 받겠다.\""},
+      {t:"B", txt:"\"환급금 들어오면 바로 나스닥 레버리지 펀드에 태워야지.\""},
+      {t:"C", txt:"작년 지출 리포트를 복기하며 내년도 예산을 재설계한다."},
+      {t:"D", txt:"환급액 전액을 배당주에 재투자해 파이프라인을 강화한다."},
+      {t:"E", txt:"1월부터 완벽하게 세팅했기에 고액 환급을 당연하게 여긴다."},
+      {t:"F", txt:"\"공돈 생겼다!\" 그동안 참았던 쇼핑 리스트를 결제한다."}
+    ]
+  },
+  {
+    e:"🏠", q:"부동산(내 집 마련)에 대한 나의 현재 생각은?",
+    a:[
+      {t:"A", txt:"\"빚내서 집 사는 건 무서워. 공무원 임대주택이 최고지.\""},
+      {t:"B", txt:"\"부동산은 회전율이 낮아. 난 언제든 뺄 수 있는 주식이 좋아.\""},
+      {t:"C", txt:"공급 물량과 학군지 데이터를 분석해 '상급지' 갈아타기를 노린다."},
+      {t:"D", txt:"거주 안정성만 확보되면 남은 자금은 전부 수익형 자산에 몰빵한다."},
+      {t:"E", txt:"주택청약저축과 장기주택저당차입금 이자 상환 공제를 체크한다."},
+      {t:"F", txt:"\"내가 살 집은 무조건 인테리어가 예뻐야 해!\""}
+    ]
+  },
+  {
+    e:"🎯", q:"내가 돈을 모으고 투자하는 궁극적인 이유는?",
+    a:[
+      {t:"A", txt:"노후에 품위 있는 삶을 유지하기 위해 (연금 보충)."},
+      {t:"B", txt:"한 번뿐인 인생, 경제적 계층 이동을 한 번쯤 해보기 위해."},
+      {t:"C", txt:"내 지적 분석과 시장 예측이 맞았다는 짜릿함을 위해."},
+      {t:"D", txt:"학교를 하루라도 빨리 떠나기 위해 (경제적 자유)."},
+      {t:"E", txt:"낭비되는 세금과 지출 없이 자산을 효율적으로 운영하기 위해."},
+      {t:"F", txt:"사고 싶은 거 사고, 가고 싶은 데 가며 즐겁게 살기 위해."}
+    ]
+  },
+  {
+    e:"🎰", q:"만약 로또 1등(당첨금 20억)이 된다면 다음 날 나의 행동은?",
+    a:[
+      {t:"A", txt:"평소처럼 출근한다. 안정적인 직장이 최고다."},
+      {t:"B", txt:"일단 연가 내고 거래소/증권사 앱부터 켜서 자산을 배분한다."},
+      {t:"C", txt:"당첨금을 즉시 엑셀로 분류하고, 세후 금액을 정밀 계산한다."},
+      {t:"D", txt:"\"드디어 끝났다.\" 바로 명퇴(명예퇴직) 절차를 알아본다."},
+      {t:"E", txt:"증여세와 자금출처조사 대비를 위해 세무사 상담부터 예약한다."},
+      {t:"F", txt:"동료들에게 커피 한 잔씩 돌리고 화려하게 짐을 싼다."}
+    ]
+  },
+  {
+    e:"💭", q:"당신에게 '월급'이란 어떤 의미인가?",
+    a:[
+      {t:"A", txt:"평생 나를 지탱해줄 든든한 보험금."},
+      {t:"B", txt:"자산을 불리기 위한 소중한 시드머니(Seed)."},
+      {t:"C", txt:"나의 노동 가치를 수치화한 리포트 데이터."},
+      {t:"D", txt:"자유의 땅으로 건너가기 위해 적립하는 마일리지."},
+      {t:"E", txt:"국가와 합법적으로 나누는 소득의 결정체."},
+      {t:"F", txt:"한 달간의 고통을 잊게 해주는 금융 치료제."}
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════
+   🏆  Result Types
+   ═══════════════════════════════════════ */
+const TYPES = {
+  A: { emoji:"🧚", cls:"type-A", label:"A유형",
+       title:"공제회 수호신 – 예적금파",
+       desc:"\"쌤, 원금 보장이 최고에요.\" 안정성을 최우선으로 여기며 장기 예금과 공제회에 충직한 금융 수호자! 당신이 있기에 이 조직도 뭔가 든든합니다.",
+       work:"월급 관리, 예금 관리, 장기 적립식 펀드",
+       item:"예금 통장 정리용 엑셀 템플릿 & 자동이체 수첩" },
+  B: { emoji:"🚀", cls:"type-B", label:"B유형",
+       title:"차트 위의 야수 – 주식/코인 공격형",
+       desc:"\"이것만 사면 10배 간다!\" 상승 차트를 보며 설레고, 폭락에도 침착한 공격형 투자자! 당신의 증거금은 언제나 전쟁터에 나가 있습니다.",
+       work:"미장 모니터링, 뉴스 분석, 단타 거래",
+       item:"듀얼 모니터와 실시간 차트 앱 구독권" },
+  C: { emoji:"📊", cls:"type-C", label:"C유형",
+       title:"엑셀 정산 장인 – 데이터 분석형",
+       desc:"\"재무제표부터 봐야지.\" 감정보다 데이터를 믿고, 냉철한 분석으로 최적의 선택을 하는 금융 엔지니어! 당신의 포트폴리오는 완벽하게 리밸런싱 됩니다.",
+       work:"자산 포트폴리오 설계, 시장 분석, 리스크 관리",
+       item:"경제신문 구독권 & 고급 자산관리 앱" },
+  D: { emoji:"🔥", cls:"type-D", label:"D유형",
+       title:"파이어족 꿈나무 – 조기은퇴 희망형",
+       desc:"\"이 정도면 50살에 탈출 가능하겠는데?\" 경제적 자유를 향해 묵묵히 걷는 진정한 FI(파이어) 신봉자! 당신의 목표는 명확하고 계획은 구체적입니다.",
+       work:"배당주 투자, 장기 자산 축적, 조기은퇴 시나리오",
+       item:"자산관리 앱 프리미엄 & 경제 자유 관련 도서" },
+  E: { emoji:"💡", cls:"type-E", label:"E유형",
+       title:"연말정산 셜록 – 절세/공제형",
+       desc:"\"이 부분은 세제 혜택 안 받으셨어요?\" 국가가 주는 공제와 혜택을 놓치지 않는 절세의 신! 당신의 세무 지식은 세무사 수준입니다.",
+       work:"연말정산 관리, 절세 전략, 공제 최적화",
+       item:"연말정산 가이드북 & 세무 전문가 상담권" },
+  F: { emoji:"🛍️", cls:"type-F", label:"F유형",
+       title:"급식실 욜로족 – 무계획 소비형",
+       desc:"\"내일의 나는 오늘의 나 책임이 아니잖아?\" 지금을 즐기는 것이 최고의 재테크라 믿는 행복한 소비가! 당신의 월급은 항상 넉넉합니다(역설적으로).",
+       work:"현재 소비 즐기기, 경험 투자",
+       item:"최신 트렌드 상품 & 카페 할인권" }
+};
+
+const TYPE_KEYS = ['A','B','C','D','E','F'];
+const TYPE_NAMES = ['공제회파','주식공격','데이터분석','파이어족','절세천재','욜로족'];
+
+/* ═══════════════════════════════════════
+   🎮  Quiz Logic
+   ═══════════════════════════════════════ */
+let cur = 0;
+let sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+let lastRes = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${cur+1}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation='none'; sec.offsetHeight;
+  sec.style.animation='fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach((ans, i) => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${ans.t}</span><span>${ans.txt}</span>`;
+    b.onclick = () => pick(ans.t, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(type, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  sc[type]++;
+  playCoinSound();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  let maxVal = 0, winner = 'A';
+  TYPE_KEYS.forEach(k => { if (sc[k] > maxVal) { maxVal = sc[k]; winner = k; } });
+
+  const r = TYPES[winner];
+  lastRes = { r, winner, scores: {...sc} };
+
+  spawnConfetti();
+  playStockUpSound();
+
+  let barsHTML = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (sc[k]/12)*100;
+    barsHTML += `<div class="bar-row">
+      <span class="bar-label">${TYPE_NAMES[i]}</span>
+      <div class="bar-track"><div class="bar-fill bf-${k}" id="bf${k}" data-w="${pct}"></div></div>
+      <span class="bar-pts">${sc[k]}점</span>
+    </div>`;
+  });
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${r.emoji}</div>
+    <div style="margin-bottom:16px;">
+      <span class="chart-bar" style="height:20px;"></span>
+      <span class="chart-bar" style="height:35px;"></span>
+      <span class="chart-bar" style="height:28px;"></span>
+      <span class="chart-bar" style="height:42px;"></span>
+      <span class="chart-bar" style="height:38px;"></span>
+    </div>
+    <div class="res-type-badge ${r.cls}">${r.label}</div>
+    <div class="res-title">[ ${r.title} ]</div>
+    <div class="res-desc">${r.desc}</div>
+    <div class="res-info-row">
+      <div class="res-info-box money-box">
+        <div class="info-label">💼 당신의 금융 전략</div>
+        <div class="info-value">${r.work}</div>
+      </div>
+      <div class="res-info-box strategy-box">
+        <div class="info-label">🎁 추천 도구</div>
+        <div class="info-value">${r.item}</div>
+      </div>
+    </div>
+    <div class="score-section">
+      <h3>📈 유형별 점수</h3>
+      ${barsHTML}
+    </div>
+    <div class="result-actions">
+      <button class="save-btn" id="saveBtn" onclick="saveResult()">내 DNA 저장하기 📸</button>
+      <button class="retry-btn" onclick="goHome()">다시 분석하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    TYPE_KEYS.forEach(k => {
+      const el = document.getElementById('bf'+k);
+      if (el) el.style.width = el.dataset.w + '%';
+    });
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if(c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if(old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#e63946','#ffd54f','#64b5f6','#4db8a8','#ef9a9a','#f59e0b','#10b981','#3b82f6'];
+  for(let i=0;i<100;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*9+5)+'px';
+    d.style.height = (Math.random()*9+5)+'px';
+    d.style.animationDuration = (Math.random()*2.5+2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6000);
+}
+
+/* ═══════════════════════════════════════
+   📸  Save Result
+   ═══════════════════════════════════════ */
+const capBgMap = {
+  'type-A':'linear-gradient(135deg,#0b1628 0%,#0d2744 50%,#0b1628 100%)',
+  'type-B':'linear-gradient(135deg,#0b1628 0%,#2a1110 50%,#0b1628 100%)',
+  'type-C':'linear-gradient(135deg,#0b1628 0%,#1a1040 50%,#0b1628 100%)',
+  'type-D':'linear-gradient(135deg,#0b1628 0%,#0a2a22 50%,#0b1628 100%)',
+  'type-E':'linear-gradient(135deg,#0b1628 0%,#2a2000 50%,#0b1628 100%)',
+  'type-F':'linear-gradient(135deg,#0b1628 0%,#2a1520 50%,#0b1628 100%)',
+};
+
+const capBadgeBg = {
+  'type-A':'linear-gradient(135deg,#64b5f6,#42a5f5)',
+  'type-B':'linear-gradient(135deg,#e63946,#ff6b7a)',
+  'type-C':'linear-gradient(135deg,#9575cd,#7e57c2)',
+  'type-D':'linear-gradient(135deg,#4db8a8,#26a69a)',
+  'type-E':'linear-gradient(135deg,#ffd54f,#ffca28)',
+  'type-F':'linear-gradient(135deg,#ef9a9a,#e57373)',
+};
+
+const capBadgeCol = {
+  'type-A':'#fff','type-B':'#fff','type-C':'#fff',
+  'type-D':'#fff','type-E':'#0b1628','type-F':'#fff',
+};
+
+async function saveResult() {
+  if (!lastRes) return;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중... ⏳';
+
+  const {r, winner, scores} = lastRes;
+
+  let barsH = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (scores[k]/12)*100;
+    barsH += `<div class="cap-br">
+      <span class="cap-bl">${TYPE_NAMES[i]}</span>
+      <div class="cap-bt"><div class="cap-bf" style="width:${pct}%"></div></div>
+      <span class="cap-bp">${scores[k]}</span>
+    </div>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'capture-card';
+  card.style.background = capBgMap[r.cls];
+  card.innerHTML = `
+    <div class="cap-emoji">${r.emoji}</div>
+    <div class="cap-chart">
+      <div class="cap-bar" style="height:20px;"></div>
+      <div class="cap-bar" style="height:35px;"></div>
+      <div class="cap-bar" style="height:28px;"></div>
+      <div class="cap-bar" style="height:42px;"></div>
+      <div class="cap-bar" style="height:38px;"></div>
+    </div>
+    <div class="cap-badge" style="background:${capBadgeBg[r.cls]};color:${capBadgeCol[r.cls]}">${r.label}</div>
+    <div class="cap-title">[ ${r.title} ]</div>
+    <div class="cap-desc">${r.desc}</div>
+    <div class="cap-info-row">
+      <div class="cap-info-box cap-money">
+        <div class="cap-il">💼 금융 전략</div>
+        <div class="cap-iv">${r.work}</div>
+      </div>
+      <div class="cap-info-box cap-strategy">
+        <div class="cap-il">🎁 추천 도구</div>
+        <div class="cap-iv">${r.item}</div>
+      </div>
+    </div>
+    <div class="cap-bars">${barsH}</div>
+    <div class="cap-wm">💰 월급날 자산 증식 DNA · 교사 생존력 테스트 13탄</div>
+  `;
+
+  document.body.appendChild(card);
+
+  try {
+    await new Promise(res => setTimeout(res, 300));
+    const canvas = await html2canvas(card, {
+      scale:2, backgroundColor:'#0b1628',
+      useCORS:true, logging:false,
+      width:600, windowWidth:600
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `자산증식DNA_${r.label}.png`, {type:'image/png'});
+        const shareData = {files:[file], title:'월급날 자산 증식 DNA', text:`나의 재테크 성격은 ${r.label}! - ${r.title}`};
+        try {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            card.remove();
+            btn.classList.remove('saving');
+            btn.textContent = '내 DNA 저장하기 📸';
+            return;
+          }
+        } catch(e){}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `자산증식DNA_${r.label}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      card.remove();
+      btn.classList.remove('saving');
+      btn.innerHTML = '저장 완료! ✅';
+      setTimeout(()=>{ btn.textContent='내 DNA 저장하기 📸'; }, 2000);
+    }, 'image/png');
+
+  } catch(e) {
+    console.error('Capture failed:', e);
+    card.remove();
+    btn.classList.remove('saving');
+    btn.textContent = '내 DNA 저장하기 📸';
+    alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+  }
+}
+</script>
+</body>
+</html>

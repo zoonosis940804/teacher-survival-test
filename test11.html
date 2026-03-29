@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💬 당신의 학교 메신저 말투는? | 교사 생존력 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0b1628;
+  --bg-mid: #111d35;
+  --bg-card: rgba(17,29,53,0.72);
+  --glass-border: rgba(120,180,255,0.18);
+  --glass-glow: rgba(100,160,255,0.06);
+  --mint: #56ffc8;
+  --sky: #64b5f6;
+  --lavender: #b39ddb;
+  --peach: #ffab91;
+  --gold: #ffd54f;
+  --text-white: #eaf0f8;
+  --text-dim: rgba(234,240,248,0.5);
+  --text-mid: rgba(234,240,248,0.78);
+  --radius: 22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 520px; height: 520px;
+  background: var(--sky);
+  opacity: 0.1;
+  top: -8%; right: -8%;
+  animation: orbA 20s ease-in-out infinite;
+}
+
+body::after {
+  width: 480px; height: 480px;
+  background: var(--mint);
+  opacity: 0.07;
+  bottom: -10%; left: -10%;
+  animation: orbB 24s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(-12vw, 18vh); }
+  66% { transform:translate(-6vw, 8vh); }
+}
+
+@keyframes orbB {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(14vw, -12vh); }
+  66% { transform:translate(8vw, -4vh); }
+}
+
+.grid-bg {
+  position: fixed; inset:0; z-index:0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(100,181,246,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100,181,246,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.sound-toggle {
+  position: fixed; top:18px; left:18px; z-index:500;
+  width:48px; height:48px; border-radius:50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(100,181,246,0.08);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 28px rgba(86,255,200,0.15);
+}
+
+.sound-toggle .icon-on,
+.sound-toggle .icon-off {
+  position: absolute;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute; left:56px; top:50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.7);
+  color: var(--mint);
+  font-size: 0.72rem; font-weight:500;
+  padding: 5px 10px; border-radius:8px;
+  white-space: nowrap;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.2s;
+}
+
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+.app-container {
+  position: relative; z-index:1;
+  width: 100%; max-width: 700px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(100,181,246,0.06);
+  padding: 40px 32px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.start-screen { text-align:center; }
+
+.start-screen .emoji-hero {
+  font-size:72px; margin-bottom:14px;
+  display:inline-block;
+  animation: heroFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-14px) rotate(3deg); }
+}
+
+.start-screen h1 {
+  font-family:'Gaegu',cursive;
+  font-size:2.2rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.35; margin-bottom:6px;
+}
+
+.start-screen h1 span {
+  background: linear-gradient(90deg, var(--mint), var(--sky));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.series-tag {
+  display:inline-block;
+  padding:4px 14px; border-radius:20px;
+  background: rgba(86,255,200,0.1);
+  border:1px solid rgba(86,255,200,0.25);
+  color: var(--mint);
+  font-size:0.75rem; font-weight:700;
+  margin-bottom:16px; letter-spacing:0.5px;
+}
+
+.start-screen .sub {
+  font-size:0.92rem;
+  color: var(--text-mid);
+  line-height:1.7; margin-bottom:32px;
+}
+
+.start-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 52px; border:none; border-radius:50px;
+  background: linear-gradient(135deg, var(--sky), var(--mint));
+  color: var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.15rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow: 0 6px 28px rgba(100,181,246,0.25);
+  position:relative; overflow:hidden;
+}
+
+.start-btn::after {
+  content:''; position:absolute;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform:translateX(-100%) rotate(25deg); }
+  100% { transform:translateX(100%) rotate(25deg); }
+}
+
+.start-btn:hover {
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 12px 36px rgba(100,181,246,0.35);
+}
+
+.progress-wrap { width:100%; margin-bottom:22px; }
+
+.progress-info {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+
+.progress-info .q-num {
+  font-family:'Gaegu',cursive;
+  font-size:1.2rem; font-weight:700;
+  color: var(--sky);
+}
+
+.progress-info .q-count {
+  font-size:0.85rem; color:var(--text-dim); font-weight:500;
+}
+
+.progress-bar-bg {
+  width:100%; height:10px;
+  background: rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden;
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--sky), var(--mint));
+  border-radius:10px;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+.question-section { animation: fadeSlide 0.45s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(36px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
+.question-text {
+  font-size:1.06rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.7; margin-bottom:24px;
+  word-break:keep-all;
+}
+
+.question-text .q-emoji {
+  display:inline-block; margin-right:6px; font-size:1.3rem;
+}
+
+.answers-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+
+.answer-btn {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:14px 15px;
+  border:1.5px solid rgba(100,181,246,0.1);
+  border-radius:16px;
+  background:rgba(255,255,255,0.03);
+  cursor:pointer; transition:all 0.22s ease;
+  text-align:left;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.84rem; color:var(--text-mid);
+  line-height:1.55; word-break:keep-all;
+}
+
+.answer-btn .num-badge {
+  flex-shrink:0; width:26px; height:26px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--sky), var(--mint));
+  color:var(--bg-deep);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700;
+  margin-top:1px;
+}
+
+.answer-btn:hover {
+  background:rgba(100,181,246,0.08);
+  border-color:var(--sky);
+  transform:translateY(-2px);
+  box-shadow:0 4px 18px rgba(100,181,246,0.1);
+  color:var(--text-white);
+}
+
+.answer-btn:active { transform:scale(0.97); }
+
+.answer-btn.picked {
+  background:rgba(86,255,200,0.1);
+  border-color:var(--mint);
+  box-shadow:0 0 18px rgba(86,255,200,0.12);
+  color:var(--mint);
+  pointer-events:none;
+}
+
+.result-screen {
+  text-align:center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.8) translateY(28px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.res-emoji {
+  font-size:84px; display:inline-block; margin-bottom:12px;
+  animation: emojiDance 1.2s ease-in-out infinite;
+}
+
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.12) rotate(-6deg); }
+  75% { transform:scale(1.12) rotate(6deg); }
+}
+
+.res-type-badge {
+  display:inline-block;
+  padding:10px 36px; border-radius:50px;
+  font-family:'Gaegu',cursive;
+  font-size:1.6rem; font-weight:700;
+  margin-bottom:8px;
+}
+
+.type-A { background:linear-gradient(135deg, #4a90e2, #357abd); color:#fff; }
+.type-B { background:linear-gradient(135deg, #f5a623, #d68910); color:#fff; }
+.type-C { background:linear-gradient(135deg, #7ed321, #5fa319); color:#fff; }
+.type-D { background:linear-gradient(135deg, #d94e50, #a63538); color:#fff; }
+.type-E { background:linear-gradient(135deg, var(--mint), #26a69a); color:var(--bg-deep); }
+.type-F { background:linear-gradient(135deg, var(--lavender), #7e57c2); color:#fff; }
+
+.res-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.3rem; font-weight:700;
+  color:var(--mint); margin-bottom:8px;
+}
+
+.res-desc {
+  font-size:0.92rem; color:var(--text-mid);
+  line-height:1.85; margin-bottom:18px;
+  word-break:keep-all; padding:0 6px;
+}
+
+.res-info-row {
+  display:flex; gap:12px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:28px;
+}
+
+.res-info-box {
+  flex:1; min-width:200px; max-width:280px;
+  padding:14px 18px; border-radius:16px;
+  text-align:left;
+}
+
+.res-info-box.role-box {
+  background:rgba(100,181,246,0.08);
+  border:1px solid rgba(100,181,246,0.2);
+}
+
+.res-info-box.tip-box {
+  background:rgba(86,255,200,0.08);
+  border:1px solid rgba(86,255,200,0.2);
+}
+
+.info-label {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.5px; margin-bottom:4px;
+}
+
+.role-box .info-label { color:var(--sky); }
+.tip-box .info-label { color:var(--mint); }
+
+.info-value {
+  font-size:0.88rem; font-weight:700;
+  color:var(--text-white); line-height:1.5;
+}
+
+.score-section {
+  margin-bottom:28px; text-align:left;
+}
+
+.score-section h3 {
+  font-size:0.85rem; font-weight:700;
+  color:var(--text-mid); margin-bottom:14px;
+  text-align:center;
+}
+
+.bar-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+
+.bar-label {
+  font-size:0.75rem; font-weight:700;
+  color:var(--text-dim); min-width:62px; text-align:right;
+}
+
+.bar-track {
+  flex:1; height:16px;
+  background:rgba(255,255,255,0.05);
+  border-radius:10px; overflow:hidden;
+}
+
+.bar-fill {
+  height:100%; border-radius:10px;
+  transition: width 1.1s cubic-bezier(.23,1,.32,1);
+  width:0;
+}
+
+.bf-A { background:linear-gradient(90deg, #4a90e2, #357abd); }
+.bf-B { background:linear-gradient(90deg, #f5a623, #d68910); }
+.bf-C { background:linear-gradient(90deg, #7ed321, #5fa319); }
+.bf-D { background:linear-gradient(90deg, #d94e50, #a63538); }
+.bf-E { background:linear-gradient(90deg, var(--mint), #26a69a); }
+.bf-F { background:linear-gradient(90deg, var(--lavender), #7e57c2); }
+
+.bar-pts {
+  font-size:0.78rem; font-weight:700;
+  color:var(--text-dim); min-width:28px;
+}
+
+.result-actions {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+
+.share-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--sky), var(--mint));
+  color:var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(100,181,246,0.3);
+}
+
+.share-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(100,181,246,0.4);
+}
+
+.retry-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(100,181,246,0.2);
+  color:var(--text-white);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+}
+
+.retry-btn:hover {
+  transform:translateY(-3px);
+  background:rgba(100,181,246,0.12);
+}
+
+.confetti-box {
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none; z-index:999; overflow:hidden;
+}
+
+.confetti-dot {
+  position:absolute; top:-20px; border-radius:3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+.msg-bubble {
+  position:fixed; pointer-events:none; z-index:998;
+  background: rgba(100,181,246,0.85);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  max-width: 150px;
+  word-break: keep-all;
+  animation: bubbleIn 0.6s ease-out;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: scale(0.6) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.deco {
+  position:fixed; font-size:26px; opacity:0.06;
+  pointer-events:none; z-index:0;
+  animation: decoD 14s ease-in-out infinite;
+}
+
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-16px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:28px 18px; }
+  .start-screen h1 { font-size:1.65rem; }
+  .start-screen .emoji-hero { font-size:56px; }
+  .question-text { font-size:0.96rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.88rem; padding:13px 14px; }
+  .res-emoji { font-size:64px; }
+  .res-type-badge { font-size:1.3rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction:column; align-items:center; }
+  .res-info-row { flex-direction:column; align-items:center; }
+  .res-info-box { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<div class="deco" style="top:5%;left:6%;animation-delay:0s;">📚</div>
+<div class="deco" style="top:20%;right:5%;animation-delay:2s;">🏫</div>
+<div class="deco" style="top:48%;left:2%;animation-delay:4s;">✏️</div>
+<div class="deco" style="top:70%;right:4%;animation-delay:6s;">🔔</div>
+<div class="deco" style="top:38%;left:92%;animation-delay:8s;">👨‍🏫</div>
+<div class="deco" style="top:85%;left:10%;animation-delay:3s;">📋</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">💬</div>
+      <h1>당신의<br><span>학교 메신저 말투</span>는?</h1>
+      <div class="series-tag">교사 생존력 테스트 · 11탄</div>
+      <p class="sub">동학년 단톡, 공문 처리, 급식 메뉴까지<br>학교 현장에서 드러나는 당신의 메신저 성향을 발견하세요!<br>📱 칼답 넵봇부터 장문 부장님까지, 6가지 유형 📱</p>
+      <button class="start-btn" onclick="beginQuiz()">분석 시작하기 🔍</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q1</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+let audioCtx = null, soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) { tog.classList.remove('muted'); tip.textContent='효과음 ON'; playSelectSound(); }
+  else { tog.classList.add('muted'); tip.textContent='효과음 OFF'; }
+}
+
+function playSelectSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const o1 = ctx.createOscillator(), g1 = ctx.createGain();
+    o1.type='sine';
+    o1.frequency.setValueAtTime(1200, now);
+    o1.frequency.exponentialRampToValueAtTime(800, now+0.1);
+    g1.gain.setValueAtTime(0.1, now);
+    g1.gain.exponentialRampToValueAtTime(0.001, now+0.15);
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.start(now); o1.stop(now+0.15);
+  } catch(e){}
+}
+
+function playResultSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const notes = [{f:523, s:0, d:0.12},{f:659, s:0.1, d:0.12},{f:784, s:0.2, d:0.12},{f:1047, s:0.32, d:0.32}];
+    notes.forEach(n => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='triangle';
+      o.frequency.setValueAtTime(n.f, now+n.s);
+      g.gain.setValueAtTime(0, now+n.s);
+      g.gain.linearRampToValueAtTime(0.18, now+n.s+0.02);
+      g.gain.setValueAtTime(0.18, now+n.s+n.d*0.6);
+      g.gain.exponentialRampToValueAtTime(0.001, now+n.s+n.d+0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now+n.s); o.stop(now+n.s+n.d+0.15);
+    });
+  } catch(e){}
+}
+
+const QS = [
+  {e:"📋", q:"전체 메신저에 '내일까지 공문 확인 후 회신 부탁드립니다'라는 공지가 떴을 때?", a:[
+    {t:"A", txt:"넵."},{t:"B", txt:"넵!! 확인했습니다!! 고생 많으셔요!!"},{t:"C", txt:"넹ㅎㅎ 내일까지 보낼게요!"},{t:"D", txt:"네."},{t:"E", txt:"넵~~ 확인했어요~~"},{t:"F", txt:"확인했습니다. 해당 건 정리해서 오늘 4교시 후 회신드리겠습니다."}
+  ]},
+  {e:"📱", q:"4교시 수업을 끝내고 왔더니 동학년 단톡에 읽지 않은 메시지가 30개가 넘는다면?", a:[
+    {t:"A", txt:"중요한 공지 하나에만 '넵' 하고 끝낸다."},{t:"B", txt:"'앗!! 수업 하느라 이제 봤어요!!!ㅠㅠㅠ'라며 미안함을 표한다."},{t:"C", txt:"'이제 봤네용ㅎㅎ 다들 고생 많으셔요!'"},{t:"D", txt:"숫자 1만 없애고 꼭 필요한 질문에만 짧게 답한다."},{t:"E", txt:"'수업 중이라 늦었네요~~ 다들 맛점 하세요~~'"},{t:"F", txt:"대화 내용을 정독한 뒤, 빠진 정보가 있으면 보충해서 답장한다."}
+  ]},
+  {e:"🍽️", q:"동료 교사가 '오늘 급식 메뉴 뭐예요? 식단표 어디 있죠?'라고 물었다면?", a:[
+    {t:"A", txt:"급식 앱 화면 캡처 전송."},{t:"B", txt:"'오!! 오늘 제육볶음 나와요!!! 짱맛!!!'"},{t:"C", txt:"'오늘 비빔밥인 것 같아용ㅎㅎ'"},{t:"D", txt:"비빔밥입니다."},{t:"E", txt:"'오늘 맛있는 거 나오면 좋겠네요~~'"},{t:"F", txt:"'오늘 메뉴는 비빔밥이고 알레르기 유발 식품은 5번, 10번입니다.'"}
+  ]},
+  {e:"😂", q:"메신저에서 'ㅎㅎ'나 'ㅋㅋ'를 사용하는 나의 스타일은?", a:[
+    {t:"A", txt:"사무적인 대화에 웃음은 사치다."},{t:"B", txt:"무조건 3개 이상! '수업도 힘든데 분위기라도 밝아야지!'"},{t:"C", txt:"어색하지 않게 1~2개 섞는 비즈니스 친절형."},{t:"D", txt:"진짜 웃길 때 'ㅋ' 하나만 찍는다."},{t:"E", txt:"부드러운 인상을 위해 '~'와 섞어서 은은하게 쓴다."},{t:"F", txt:"상황에 따라 예의 바르게 허허 웃는 느낌으로 쓴다."}
+  ]},
+  {e:"❓", q:"업무 부장님이 메신저로 조금 까다로운 자료 제출을 요청했다면?", a:[
+    {t:"A", txt:"넵. (일단 대답하고 바로 작업 착수)"},{t:"B", txt:"'앗!! 제가 하면 될까요?! 확인해볼게요!!'"},{t:"C", txt:"'조금 어렵긴 한데용ㅎㅎ 일단 해볼게요!'"},{t:"D", txt:"확인 후 다시 말씀드리겠습니다."},{t:"E", txt:"'음~~ 상황이 조금 애매하네요~~ 해볼게요~~'"},{t:"F", txt:"'현재 학급 업무가 몰려 있어 완료 예상 시각을 미리 말씀드려도 될까요?'"}
+  ]},
+  {e:"⏰", q:"퇴근 5분 전, '내일 아침 일찍 협의회 있습니다'라는 전체 메시지를 봤을 때?", a:[
+    {t:"A", txt:"넵. (영혼 없음)"},{t:"B", txt:"'넵!! 알겠습니다!! 고생 많으십니다!!'"},{t:"C", txt:"'넹ㅠㅠ 내일 뵙겠습니당!'"},{t:"D", txt:"네. (단호)"},{t:"E", txt:"'넵... 내일 뵙겠습니다~~'"},{t:"F", txt:"'일정 확인했습니다. 관련 자료 미리 준비해서 참석하겠습니다.'"}
+  ]},
+  {e:"😄", q:"동료 교사가 귀여운 학생의 실수담이나 짤을 메신저로 보냈다면?", a:[
+    {t:"A", txt:"ㅎㅎ"},{t:"B", txt:"'앜ㅋㅋㅋㅋ 대박ㅋㅋㅋㅋ 너무 귀여워요 선생님!!!'"},{t:"C", txt:"'아ㅋㅋㅋ 진짜 웃기네용!'"},{t:"D", txt:"(이모티콘 하나 혹은 무응답)"},{t:"E", txt:"'에고~~ 애들은 참 귀엽네요~~'"},{t:"F", txt:"'하하, 정말 아이답고 재미있는 일화네요. 공유 감사합니다.'"}
+  ]},
+  {e:"🤝", q:"내가 메시지를 보낼 때 가장 신경 쓰는 부분은?", a:[
+    {t:"A", txt:"용건만 간단히, 명확하게."},{t:"B", txt:"내가 너무 차가워 보이지는 않는지."},{t:"C", txt:"상대방이 내 말투에 상처받지 않을지."},{t:"D", txt:"맞춤법과 정확한 맞춤 양식."},{t:"E", txt:"문장이 부드럽게 끝나는지 (~요, ~요~)."},{t:"F", txt:"오해의 소지 없이 상세하고 논리적인지."}
+  ]},
+  {e:"🙏", q:"동학년 협의를 마치고 '수고하셨습니다'라고 마무리 인사를 할 때?", a:[
+    {t:"A", txt:"넵."},{t:"B", txt:"'고생 많으셨습니다!!! 주말 푹 쉬세요 선생님!!!'"},{t:"C", txt:"'고생하셨어용ㅎㅎ 내일 봬요!'"},{t:"D", txt:"네, 수고하셨습니다."},{t:"E", txt:"'선생님도 수고하셨어요~~'"},{t:"F", txt:"'덕분에 좋은 아이디어를 많이 얻었습니다. 감사합니다.'"}
+  ]},
+  {e:"🌊", q:"메시지 끝에 물결(~~)을 사용하는 나의 기준은?", a:[
+    {t:"A", txt:"거의 안 씀."},{t:"B", txt:"모든 문장의 마무리는 물결~~"},{t:"C", txt:"친절해 보이고 싶을 때 가끔 씀."},{t:"D", txt:"물결보다는 마침표를 선호함."},{t:"E", txt:"'화난 거 아니에요~'라는 신호로 씀."},{t:"F", txt:"공문이 아닌 개인적 부탁을 할 때만 쓴다."}
+  ]},
+  {e:"👁️", q:"단톡방에서 '나만 안 읽은 숫자 1'이 떠 있을 때 나의 심리는?", a:[
+    {t:"A", txt:"아무 생각 없다."},{t:"B", txt:"빨리 없애야 할 것 같은 강박이 생긴다."},{t:"C", txt:"몰래 미리보기로 보고 나중에 답장한다."},{t:"D", txt:"다들 무슨 대화 하나 궁금하지만 퇴근 후엔 안 본다."},{t:"E", txt:"나중에 여유 있을 때 천천히 확인한다~~"},{t:"F", txt:"대화의 맥락을 놓칠까 봐 처음부터 끝까지 정독한다."}
+  ]},
+  {e:"💭", q:"당신에게 '학교 메신저'란 어떤 존재인가?", a:[
+    {t:"A", txt:"업무 처리를 위한 전산 도구."},{t:"B", txt:"동료 교사들과 소통하는 활력소."},{t:"C", txt:"사회적 가면을 쓰고 대화하는 공간."},{t:"D", txt:"공식적인 업무 기록 장부."},{t:"E", txt:"둥글둥글하게 살아가는 생존 수단."},{t:"F", txt:"정보 공유와 전문성 향상을 위한 창구."}
+  ]}
+];
+
+const TYPES = {
+  A: { emoji:"⚡", cls:"type-A", label:"A유형",
+       title:"칼답 넵봇 – 공문 처리 마법사",
+       desc:"메신저는 도구일 뿐. 말은 짧고 정확하며, 공문 제출도 칼같이 챙기는 당신. '감정' 따위는 필요 없고 '효율'만이 신이라고 믿습니다. 부장님도 당신의 '넵'에 믿음을 갖습니다.",
+       role:"공문 담당, 행정업무 담당, 업무 효율화",
+       tip:"가끔은 따뜻한 말 한 마디도 좋아요!" },
+  B: { emoji:"🌟", cls:"type-B", label:"B유형",
+       title:"리액션 요정 – 동학년 분위기 메이커",
+       desc:"느낌표가 많고, 애정과 응원으로 가득한 당신. 메신저 창이 당신의 무대고, 동료들도 당신의 텍스트를 읽으면 절로 기분이 좋아집니다. 동학년의 비타민, 학교의 희망입니다.",
+       role:"행사 담당, 학생자치, 동학년 화합 주도",
+       tip:"때로는 잠수도 필요해요~" },
+  C: { emoji:"🌸", cls:"type-C", label:"C유형",
+       title:"온화한 넹ㅎㅎ – 친절한 옆 반 선생님",
+       desc:"모든 상황에 'ㅎㅎ'를 붙여 상대방을 편하게 만드는 존재. 진심 어린 배려심으로 학교 문화의 완충제 역할을 합니다. 당신은 누구와도 잘 어울리는 조직의 润滑油입니다.",
+       role:"상담, 학부모 교육, 동료 지원",
+       tip:"당신의 온화함이 얼마나 소중한지 아세요?" },
+  D: { emoji:"⚙️", cls:"type-D", label:"D유형",
+       title:"마침점 단호박 – 교직의 정석",
+       desc:"마침표만 찍는 당신, 감정 표현은 최소지만 그 신뢰도는 높습니다. 메신저도 업무용으로 철저하며, 당신의 '네'는 깔끔한 약속입니다. 학교의 기둥 같은 존재.",
+       role:"규정 준수, 업무 감시, 원칙 관리",
+       tip:"가끔은 상대방의 감정도 읽어주세요!" },
+  E: { emoji:"🌊", cls:"type-E", label:"E유형",
+       title:"물결 무늬 감성 – 유들유들한 선배님",
+       desc:"'~'와 '어'로 시작하는 문장, 모든 것을 '님'으로 부르는 당신. 직장 문화 속에서 부드럽게 '유들유들' 흘러가는 타입. 조직의 말랑한 완충재입니다.",
+       role:"신입 지도, 감정 노동, 직장 분위기 조성",
+       tip:"당신의 여유로움은 그 자체로 팀의 스트레스를 덜어줘요!" },
+  F: { emoji:"📚", cls:"type-F", label:"F유형",
+       title:"장문 서술형 – 꼼꼼한 업무 부장님",
+       desc:"메신저를 마치 이메일처럼 다루는 당신. 모든 정보를 정확하고 상세하게 전달하며, 당신의 말은 기록이자 증거입니다. 학교의 문서 철학가입니다.",
+       role:"기획, 자료 작성, 정보 관리, 문서 담당",
+       tip:"가끔은 핵심만 간략하게 전해도 좋아요!" }
+};
+
+const TYPE_KEYS = ['A','B','C','D','E','F'];
+const TYPE_NAMES = ['칼답형','리액션','온화형','단호형','감성형','장문형'];
+
+let cur = 0;
+let sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+let lastRes = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${cur+1}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation='none'; sec.offsetHeight;
+  sec.style.animation='fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach((ans) => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${ans.t}</span><span>${ans.txt}</span>`;
+    b.onclick = () => pick(ans.t, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(type, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  sc[type]++;
+  playSelectSound();
+  showMessageBubble();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showMessageBubble() {
+  const bubbles = ['카톡!', '핑!', '딩동~', '메시지!', '알림!'];
+  const bubble = bubbles[Math.floor(Math.random() * bubbles.length)];
+  const el = document.createElement('div');
+  el.className = 'msg-bubble';
+  el.textContent = bubble;
+  el.style.left = Math.random() * 80 + 10 + '%';
+  el.style.top = Math.random() * 30 + 10 + '%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  let maxVal = 0, winner = 'A';
+  TYPE_KEYS.forEach(k => { if (sc[k] > maxVal) { maxVal = sc[k]; winner = k; } });
+
+  const r = TYPES[winner];
+  lastRes = { r, winner, scores: {...sc} };
+
+  spawnConfetti();
+  playResultSound();
+
+  let barsHTML = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (sc[k]/12)*100;
+    barsHTML += `<div class="bar-row">
+      <span class="bar-label">${TYPE_NAMES[i]}</span>
+      <div class="bar-track"><div class="bar-fill bf-${k}" id="bf${k}" data-w="${pct}"></div></div>
+      <span class="bar-pts">${sc[k]}점</span>
+    </div>`;
+  });
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${r.emoji}</div>
+    <div class="res-type-badge ${r.cls}">${r.label}</div>
+    <div class="res-title">[ ${r.title} ]</div>
+    <div class="res-desc">${r.desc}</div>
+    <div class="res-info-row">
+      <div class="res-info-box role-box">
+        <div class="info-label">👩‍🏫 적합한 역할</div>
+        <div class="info-value">${r.role}</div>
+      </div>
+      <div class="res-info-box tip-box">
+        <div class="info-label">💡 한 마디 팁</div>
+        <div class="info-value">${r.tip}</div>
+      </div>
+    </div>
+    <div class="score-section">
+      <h3>📊 유형별 점수</h3>
+      ${barsHTML}
+    </div>
+    <div class="result-actions">
+      <button class="share-btn" onclick="shareResult()">동료 선생님과 공유하기 💬</button>
+      <button class="retry-btn" onclick="goHome()">다시 분석하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    TYPE_KEYS.forEach(k => {
+      const el = document.getElementById('bf'+k);
+      if (el) el.style.width = el.dataset.w + '%';
+    });
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if(c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if(old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#56ffc8','#64b5f6','#b39ddb','#ffab91','#ffd54f','#80cbc4','#ce93d8','#81d4fa','#a5d6a7','#ef9a9a'];
+  for(let i=0;i<90;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*9+5)+'px';
+    d.style.height = (Math.random()*9+5)+'px';
+    d.style.animationDuration = (Math.random()*2.5+2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6000);
+}
+
+function shareResult() {
+  if (!lastRes) return;
+  const {r} = lastRes;
+  const text = `당신의 학교 메신저 말투는 "${r.label}" 입니다!\n${r.title}\n\n당신도 확인해보세요 👉`;
+  if (navigator.share) {
+    navigator.share({title: '당신의 학교 메신저 말투는?', text: text}).catch(err => {});
+  } else {
+    alert('공유: ' + text);
+  }
+}
+</script>
+</body>
+</html>

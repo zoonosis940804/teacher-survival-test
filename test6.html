@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🪴 나의 교실 인테리어 성향 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0d1a14;
+  --bg-mid: #111f17;
+  --bg-card: rgba(14,26,18,0.75);
+  --glass-border: rgba(100,210,140,0.18);
+  --glass-glow: rgba(80,200,120,0.06);
+  --mint: #56ffc8;
+  --green: #69d98c;
+  --sage: #a8d5b5;
+  --peach: #ffb997;
+  --gold: #ffd166;
+  --lavender: #c9b8f0;
+  --sky: #7ec8e3;
+  --text-white: #eaf4ee;
+  --text-dim: rgba(234,244,238,0.48);
+  --text-mid: rgba(234,244,238,0.78);
+  --radius: 22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(130px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 520px; height: 520px;
+  background: #3eb870;
+  opacity: 0.1;
+  top: -8%; right: -8%;
+  animation: orbA 22s ease-in-out infinite;
+}
+
+body::after {
+  width: 480px; height: 480px;
+  background: #56ffc8;
+  opacity: 0.07;
+  bottom: -10%; left: -10%;
+  animation: orbB 26s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(-12vw, 18vh); }
+  66% { transform:translate(-6vw, 8vh); }
+}
+@keyframes orbB {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(14vw, -12vh); }
+  66% { transform:translate(8vw, -4vh); }
+}
+
+.grid-bg {
+  position: fixed; inset:0; z-index:0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(100,210,140,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100,210,140,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Sound Toggle ── */
+.sound-toggle {
+  position: fixed; top:18px; left:18px; z-index:500;
+  width:48px; height:48px; border-radius:50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(100,210,140,0.08);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 28px rgba(86,255,200,0.15);
+}
+
+.sound-toggle .icon-on,
+.sound-toggle .icon-off {
+  position: absolute;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute; left:56px; top:50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.7);
+  color: var(--mint);
+  font-size: 0.72rem; font-weight:500;
+  padding: 5px 10px; border-radius:8px;
+  white-space: nowrap;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.2s;
+}
+
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+/* ── App ── */
+.app-container {
+  position: relative; z-index:1;
+  width: 100%; max-width: 700px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.38), inset 0 1px 0 rgba(100,210,140,0.06);
+  padding: 40px 32px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── Start ── */
+.start-screen { text-align:center; }
+
+.start-screen .emoji-hero {
+  font-size:72px; margin-bottom:14px;
+  display:inline-block;
+  animation: heroFloat 2.8s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-14px) rotate(4deg); }
+}
+
+.start-screen h1 {
+  font-family:'Gaegu',cursive;
+  font-size:2.2rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.35; margin-bottom:6px;
+}
+
+.start-screen h1 span {
+  background: linear-gradient(90deg, var(--green), var(--mint));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.series-tag {
+  display:inline-block;
+  padding:4px 14px; border-radius:20px;
+  background: rgba(86,255,200,0.1);
+  border:1px solid rgba(86,255,200,0.25);
+  color: var(--mint);
+  font-size:0.75rem; font-weight:700;
+  margin-bottom:16px; letter-spacing:0.5px;
+}
+
+.start-screen .sub {
+  font-size:0.92rem;
+  color: var(--text-mid);
+  line-height:1.7; margin-bottom:32px;
+}
+
+.start-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 52px; border:none; border-radius:50px;
+  background: linear-gradient(135deg, var(--green), var(--mint));
+  color: var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.15rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow: 0 6px 28px rgba(105,217,140,0.28);
+  position:relative; overflow:hidden;
+}
+
+.start-btn::after {
+  content:''; position:absolute;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform:translateX(-100%) rotate(25deg); }
+  100% { transform:translateX(100%) rotate(25deg); }
+}
+
+.start-btn:hover {
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 12px 36px rgba(86,255,200,0.35);
+}
+
+/* ── Progress ── */
+.progress-wrap { width:100%; margin-bottom:22px; }
+
+.progress-info {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+
+.progress-info .q-num {
+  font-family:'Gaegu',cursive;
+  font-size:1.2rem; font-weight:700;
+  color: var(--green);
+}
+
+.progress-info .q-count {
+  font-size:0.85rem; color:var(--text-dim); font-weight:500;
+}
+
+.progress-bar-bg {
+  width:100%; height:10px;
+  background: rgba(255,255,255,0.06);
+  border-radius:10px; overflow:hidden;
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--green), var(--mint));
+  border-radius:10px;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+/* ── Question ── */
+.question-section { animation: fadeSlide 0.45s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(36px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
+.question-text {
+  font-size:1.06rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.7; margin-bottom:24px;
+  word-break:keep-all;
+}
+
+.question-text .q-emoji {
+  display:inline-block; margin-right:6px; font-size:1.3rem;
+}
+
+/* ── Answers ── */
+.answers-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+
+.answer-btn {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:14px 15px;
+  border:1.5px solid rgba(100,210,140,0.1);
+  border-radius:16px;
+  background:rgba(255,255,255,0.03);
+  cursor:pointer; transition:all 0.22s ease;
+  text-align:left;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.84rem; color:var(--text-mid);
+  line-height:1.55; word-break:keep-all;
+}
+
+.answer-btn .num-badge {
+  flex-shrink:0; width:26px; height:26px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--green), var(--mint));
+  color:var(--bg-deep);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700;
+  margin-top:1px;
+}
+
+.answer-btn:hover {
+  background:rgba(100,210,140,0.08);
+  border-color:var(--green);
+  transform:translateY(-2px);
+  box-shadow:0 4px 18px rgba(100,210,140,0.1);
+  color:var(--text-white);
+}
+
+.answer-btn:active { transform:scale(0.97); }
+
+.answer-btn.picked {
+  background:rgba(86,255,200,0.1);
+  border-color:var(--mint);
+  box-shadow:0 0 18px rgba(86,255,200,0.12);
+  color:var(--mint);
+  pointer-events:none;
+}
+
+/* ── Result ── */
+.result-screen {
+  text-align:center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.8) translateY(28px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.res-emoji {
+  font-size:84px; display:inline-block; margin-bottom:12px;
+  animation: emojiDance 1.2s ease-in-out infinite;
+}
+
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.12) rotate(-6deg); }
+  75% { transform:scale(1.12) rotate(6deg); }
+}
+
+.res-type-badge {
+  display:inline-block;
+  padding:10px 36px; border-radius:50px;
+  font-family:'Gaegu',cursive;
+  font-size:1.6rem; font-weight:700;
+  margin-bottom:8px;
+}
+
+.type-A { background:linear-gradient(135deg, #b0c4de, #778ca3); color:#fff; }
+.type-B { background:linear-gradient(135deg, #69d98c, #2e9e5b); color:#fff; }
+.type-C { background:linear-gradient(135deg, var(--gold), #f9a825); color:#1a1200; }
+.type-D { background:linear-gradient(135deg, var(--peach), #e8824a); color:#fff; }
+.type-E { background:linear-gradient(135deg, var(--sky), #3a8fa3); color:#fff; }
+.type-F { background:linear-gradient(135deg, #a8c5a0, #6b8c64); color:#fff; }
+
+.res-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.3rem; font-weight:700;
+  color:var(--mint); margin-bottom:8px;
+}
+
+.res-desc {
+  font-size:0.92rem; color:var(--text-mid);
+  line-height:1.85; margin-bottom:18px;
+  word-break:keep-all; padding:0 6px;
+}
+
+.res-info-row {
+  display:flex; gap:12px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:28px;
+}
+
+.res-info-box {
+  flex:1; min-width:200px; max-width:280px;
+  padding:14px 18px; border-radius:16px;
+  text-align:left;
+}
+
+.res-info-box.work-box {
+  background:rgba(100,210,140,0.08);
+  border:1px solid rgba(100,210,140,0.22);
+}
+
+.res-info-box.item-box {
+  background:rgba(86,255,200,0.08);
+  border:1px solid rgba(86,255,200,0.2);
+}
+
+.info-label {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.5px; margin-bottom:4px;
+}
+
+.work-box .info-label { color:var(--green); }
+.item-box .info-label { color:var(--mint); }
+
+.info-value {
+  font-size:0.88rem; font-weight:700;
+  color:var(--text-white); line-height:1.5;
+}
+
+/* Score Bars */
+.score-section {
+  margin-bottom:28px; text-align:left;
+}
+
+.score-section h3 {
+  font-size:0.85rem; font-weight:700;
+  color:var(--text-mid); margin-bottom:14px;
+  text-align:center;
+}
+
+.bar-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+
+.bar-label {
+  font-size:0.75rem; font-weight:700;
+  color:var(--text-dim); min-width:62px; text-align:right;
+}
+
+.bar-track {
+  flex:1; height:16px;
+  background:rgba(255,255,255,0.05);
+  border-radius:10px; overflow:hidden;
+}
+
+.bar-fill {
+  height:100%; border-radius:10px;
+  transition: width 1.1s cubic-bezier(.23,1,.32,1);
+  width:0;
+}
+
+.bf-A { background:linear-gradient(90deg, #b0c4de, #778ca3); }
+.bf-B { background:linear-gradient(90deg, #69d98c, #2e9e5b); }
+.bf-C { background:linear-gradient(90deg, var(--gold), #f9a825); }
+.bf-D { background:linear-gradient(90deg, var(--peach), #e8824a); }
+.bf-E { background:linear-gradient(90deg, var(--sky), #3a8fa3); }
+.bf-F { background:linear-gradient(90deg, #a8c5a0, #6b8c64); }
+
+.bar-pts {
+  font-size:0.78rem; font-weight:700;
+  color:var(--text-dim); min-width:28px;
+}
+
+/* ── Action Buttons ── */
+.result-actions {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+
+.save-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--lavender), #8a6fc8);
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(180,160,230,0.28);
+}
+
+.save-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(180,160,230,0.42);
+}
+
+.save-btn.saving { pointer-events:none; opacity:0.7; }
+
+.retry-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--green), var(--mint));
+  color:var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(105,217,140,0.3);
+}
+
+.retry-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(86,255,200,0.38);
+}
+
+/* ── Capture Card ── */
+.capture-card {
+  position:fixed; left:-9999px; top:0;
+  width:600px; padding:48px 40px 40px;
+  border-radius:28px;
+  font-family:'Noto Sans KR',sans-serif;
+  text-align:center; z-index:-1;
+}
+
+.capture-card .cap-wm {
+  font-size:0.68rem; color:rgba(234,244,238,0.35);
+  margin-top:18px; letter-spacing:1px;
+}
+
+.capture-card .cap-emoji { font-size:68px; margin-bottom:10px; }
+
+.capture-card .cap-badge {
+  display:inline-block; padding:8px 30px; border-radius:50px;
+  font-family:'Gaegu',cursive;
+  font-size:1.5rem; font-weight:700;
+  margin-bottom:10px;
+}
+
+.capture-card .cap-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.2rem; font-weight:700;
+  color:var(--mint); margin-bottom:10px;
+}
+
+.capture-card .cap-desc {
+  font-size:0.84rem; color:rgba(234,244,238,0.78);
+  line-height:1.8; word-break:keep-all;
+  margin-bottom:16px; padding:0 10px;
+}
+
+.capture-card .cap-info-row {
+  display:flex; gap:10px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:8px;
+}
+
+.capture-card .cap-info-box {
+  flex:1; min-width:180px; max-width:250px;
+  padding:10px 14px; border-radius:12px;
+  text-align:left;
+}
+
+.capture-card .cap-work {
+  background:rgba(100,210,140,0.12);
+  border:1px solid rgba(100,210,140,0.25);
+}
+
+.capture-card .cap-item {
+  background:rgba(86,255,200,0.12);
+  border:1px solid rgba(86,255,200,0.25);
+}
+
+.capture-card .cap-il {
+  font-size:0.65rem; font-weight:700;
+  margin-bottom:2px; letter-spacing:0.5px;
+}
+
+.capture-card .cap-work .cap-il { color:var(--green); }
+.capture-card .cap-item .cap-il { color:var(--mint); }
+
+.capture-card .cap-iv {
+  font-size:0.82rem; font-weight:700;
+  color:#fff; line-height:1.5;
+}
+
+.capture-card .cap-bars { text-align:left; margin-top:16px; }
+
+.capture-card .cap-br {
+  display:flex; align-items:center; gap:6px; margin-bottom:5px;
+}
+
+.capture-card .cap-bl {
+  font-size:0.68rem; font-weight:700;
+  color:rgba(234,244,238,0.45); min-width:56px; text-align:right;
+}
+
+.capture-card .cap-bt {
+  flex:1; height:12px;
+  background:rgba(255,255,255,0.08);
+  border-radius:6px; overflow:hidden;
+}
+
+.capture-card .cap-bf {
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg, var(--green), var(--mint));
+}
+
+.capture-card .cap-bp {
+  font-size:0.68rem; font-weight:700;
+  color:rgba(234,244,238,0.45); min-width:24px;
+}
+
+/* ── Confetti ── */
+.confetti-box {
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none; z-index:999; overflow:hidden;
+}
+
+.confetti-dot {
+  position:absolute; top:-20px; border-radius:3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Deco ── */
+.deco {
+  position:fixed; font-size:26px; opacity:0.07;
+  pointer-events:none; z-index:0;
+  animation: decoD 14s ease-in-out infinite;
+}
+
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-16px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+/* ── Responsive ── */
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:28px 18px; }
+  .start-screen h1 { font-size:1.65rem; }
+  .start-screen .emoji-hero { font-size:56px; }
+  .question-text { font-size:0.96rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.88rem; padding:13px 14px; }
+  .res-emoji { font-size:64px; }
+  .res-type-badge { font-size:1.3rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction:column; align-items:center; }
+  .res-info-row { flex-direction:column; align-items:center; }
+  .res-info-box { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<div class="deco" style="top:5%;left:6%;animation-delay:0s;">🪴</div>
+<div class="deco" style="top:20%;right:5%;animation-delay:2s;">🌿</div>
+<div class="deco" style="top:48%;left:2%;animation-delay:4s;">🖼️</div>
+<div class="deco" style="top:70%;right:4%;animation-delay:6s;">🪑</div>
+<div class="deco" style="top:38%;left:92%;animation-delay:8s;">🌱</div>
+<div class="deco" style="top:85%;left:10%;animation-delay:3s;">☕</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">🪴</div>
+      <h1>나의 교실<br><span>인테리어 성향 테스트</span></h1>
+      <div class="series-tag">시리즈 6탄 · 교실 꾸미기 유형 테스트</div>
+      <p class="sub">텅 빈 교실 앞에서 당신의 본능은?<br>미니멀부터 정글, 감성 카페까지 – 6가지 유형으로 알아보는<br>🌿 나만의 교실 인테리어 DNA 🌿</p>
+      <button class="start-btn" onclick="beginQuiz()">내 스타일 알아보기 🔍</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q1</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   🔊  Sound Engine
+   ═══════════════════════════════════════ */
+let audioCtx = null, soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) { tog.classList.remove('muted'); tip.textContent='효과음 ON'; playSelectSound(); }
+  else { tog.classList.add('muted'); tip.textContent='효과음 OFF'; }
+}
+
+/* 자연 속 새소리 느낌의 클릭음 */
+function playSelectSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    // 잎사귀 살랑이는 느낌
+    const o1 = ctx.createOscillator(), g1 = ctx.createGain();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(900, now);
+    o1.frequency.exponentialRampToValueAtTime(1500, now + 0.06);
+    o1.frequency.exponentialRampToValueAtTime(700, now + 0.1);
+    g1.gain.setValueAtTime(0.07, now);
+    g1.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.start(now); o1.stop(now + 0.14);
+    // 포근한 화음
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(1400, now + 0.03);
+    o2.frequency.exponentialRampToValueAtTime(2200, now + 0.12);
+    g2.gain.setValueAtTime(0.04, now + 0.03);
+    g2.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(now + 0.03); o2.stop(now + 0.18);
+  } catch(e){}
+}
+
+/* 인테리어 완성! 따스한 팡파레 */
+function playResultSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    // 포근한 자연 테마 멜로디
+    const notes = [
+      {f:440, s:0, d:0.14},
+      {f:554, s:0.12, d:0.14},
+      {f:659, s:0.24, d:0.14},
+      {f:880, s:0.38, d:0.34}
+    ];
+    notes.forEach(n => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(n.f, now + n.s);
+      g.gain.setValueAtTime(0, now + n.s);
+      g.gain.linearRampToValueAtTime(0.15, now + n.s + 0.02);
+      g.gain.setValueAtTime(0.15, now + n.s + n.d * 0.6);
+      g.gain.exponentialRampToValueAtTime(0.001, now + n.s + n.d + 0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now + n.s); o.stop(now + n.s + n.d + 0.15);
+      // 자연스러운 하모닉
+      const oh = ctx.createOscillator(), gh = ctx.createGain();
+      oh.type = 'sine';
+      oh.frequency.setValueAtTime(n.f * 1.5, now + n.s);
+      gh.gain.setValueAtTime(0, now + n.s);
+      gh.gain.linearRampToValueAtTime(0.04, now + n.s + 0.02);
+      gh.gain.exponentialRampToValueAtTime(0.001, now + n.s + n.d + 0.1);
+      oh.connect(gh); gh.connect(ctx.destination);
+      oh.start(now + n.s); oh.stop(now + n.s + n.d + 0.1);
+    });
+    // 마무리 부드러운 둔탁음 (화분 놓는 소리 느낌)
+    const on = ctx.createOscillator(), gn = ctx.createGain();
+    on.type = 'sine';
+    on.frequency.setValueAtTime(180, now + 0.56);
+    on.frequency.exponentialRampToValueAtTime(90, now + 0.72);
+    gn.gain.setValueAtTime(0.12, now + 0.56);
+    gn.gain.exponentialRampToValueAtTime(0.001, now + 0.78);
+    on.connect(gn); gn.connect(ctx.destination);
+    on.start(now + 0.56); on.stop(now + 0.78);
+  } catch(e){}
+}
+
+/* ═══════════════════════════════════════
+   📝  Quiz Data — 12 Questions
+   ═══════════════════════════════════════ */
+// A: 미니멀 / B: 정글(식물) / C: 맥시멀(만물상) / D: 감성(카페) / E: 스마트(테크) / F: 실용(생존)
+const QS = [
+  {
+    e:"🚪", q:"새 학기, 텅 빈 교실에 처음 들어섰을 때 가장 먼저 드는 생각은?",
+    a:[
+      {t:"A", txt:"버릴 게 산더미군. 일단 싹 다 비우자."},
+      {t:"B", txt:"어디에 화분을 놓으면 햇빛이 잘 들까?"},
+      {t:"C", txt:"이 넓은 벽을 무엇으로 가득 채울까?"},
+      {t:"D", txt:"조명과 패브릭으로 아늑하게 꾸며야지."},
+      {t:"E", txt:"멀티탭 위치부터 확인하자. 충전기가 우선이다."},
+      {t:"F", txt:"작년 샘이 쓰고 남은 거 뭐 없나?"}
+    ]
+  },
+  {
+    e:"✏️", q:"내 책상 위 '필기구'의 상태는?",
+    a:[
+      {t:"A", txt:"딱 쓰는 펜 2~3개만 꽂혀 있는 초깔끔 상태."},
+      {t:"B", txt:"연필꽂이 대신 작은 화분이 그 자리를 차지함."},
+      {t:"C", txt:"색깔별, 종류별로 수십 자루가 빽빽하게 꽂혀 있음."},
+      {t:"D", txt:"디자인이 예쁜 한정판 볼펜들이 전시되어 있음."},
+      {t:"E", txt:"펜보다는 태블릿 펜슬과 터치패드가 메인임."},
+      {t:"F", txt:"어디선가 굴러다니던 펜을 그때그때 집어 씀."}
+    ]
+  },
+  {
+    e:"🖼️", q:"교실 뒷게시판 꾸미기, 당신의 스타일은?",
+    a:[
+      {t:"A", txt:"흰 배경에 아이들 작품만 딱딱 맞게 붙인 절제의 미."},
+      {t:"B", txt:"초록색 부직포와 인조 넝쿨로 만든 작은 숲."},
+      {t:"C", txt:"빈틈을 허용하지 않는 화려한 장식과 입체 종이접기."},
+      {t:"D", txt:"파스텔톤 배경지와 감성 문구가 적힌 가랜드."},
+      {t:"E", txt:"TV 화면이나 QR코드를 활용한 디지털 갤러리."},
+      {t:"F", txt:'"내용이 중요하지!" 작년 게시물을 대충 덧방한다.'}
+    ]
+  },
+  {
+    e:"👃", q:"내 교실에 '향기'가 난다면 어떤 향일까?",
+    a:[
+      {t:"A", txt:"무향(無香). 깨끗하게 청소된 소독취가 최고다."},
+      {t:"B", txt:"숲속에 온 듯한 피톤치드와 흙 냄새."},
+      {t:"C", txt:"달콤한 사탕과 아이들의 에너지가 섞인 냄새."},
+      {t:"D", txt:"은은한 라벤더 디퓨저나 고급진 우디 향."},
+      {t:"E", txt:"새 기계에서 나는 묘한 전자기기 냄새."},
+      {t:"F", txt:"점심시간에 먹은 제육볶음 잔향."}
+    ]
+  },
+  {
+    e:"🧹", q:"아이들이 하교한 후 바닥에 종이조각이 떨어져 있다면?",
+    a:[
+      {t:"A", txt:"바로 집어서 쓰레기통으로. 1초도 못 참는다."},
+      {t:"B", txt:'"내일 아이들과 함께 주우며 환경 사랑을 실천하자."'},
+      {t:"C", txt:'"이건 아이들의 활동 흔적이지." 하며 크게 신경 안 쓴다.'},
+      {t:"D", txt:"예쁜 빗자루 세트로 우아하게 쓸어 담는다."},
+      {t:"E", txt:"로봇청소기를 돌리고 싶은 충동을 느낀다."},
+      {t:"F", txt:"발로 슥 밀어서 구석으로 보낸다."}
+    ]
+  },
+  {
+    e:"💡", q:"내 교실의 '조명' 환경은 어떤가요?",
+    a:[
+      {t:"A", txt:"형광등 풀 가동. 구석구석 밝아야 속이 시원함."},
+      {t:"B", txt:"창가 햇살이 최고. 커튼을 활짝 열어둔다."},
+      {t:"C", txt:"아이들이 직접 만든 전등갓으로 꾸민 아기자기한 조명."},
+      {t:"D", txt:"형광등은 끄고 노란색 장식 전구와 스탠드 활용."},
+      {t:"E", txt:"모니터 조명과 화려한 RGB LED 바."},
+      {t:"F", txt:"들어올 때 켜고 나갈 때 끄는 본연의 기능 충실."}
+    ]
+  },
+  {
+    e:"🏠", q:"교실 한구석에 '비밀 공간'을 만든다면?",
+    a:[
+      {t:"A", txt:"모든 비품을 숨겨두는 보이지 않는 창고."},
+      {t:"B", txt:"흙을 만질 수 있는 실내 작은 텃밭."},
+      {t:"C", txt:"보드게임과 장난감이 가득한 놀이 공원."},
+      {t:"D", txt:"빈백과 러그가 깔린 1인용 독서 카페."},
+      {t:"E", txt:"각종 기기를 충전하고 실험하는 테크 존."},
+      {t:"F", txt:"내가 몰래 초콜릿 까먹는 서랍 속 공간."}
+    ]
+  },
+  {
+    e:"👨‍👩‍👧", q:"학부모님이 교실을 방문했을 때 가장 먼저 하실 법한 말은?",
+    a:[
+      {t:"A", txt:'"와, 선생님 교실이 모델하우스처럼 깔끔하네요!"'},
+      {t:"B", txt:'"여기가 교실인가요 식물원인가요? 공기가 좋네요."'},
+      {t:"C", txt:'"볼거리가 정말 많네요! 아이들이 심심할 틈이 없겠어요."'},
+      {t:"D", txt:'"교실 분위기가 너무 예뻐서 여기서 차 한 잔 하고 싶어요."'},
+      {t:"E", txt:'"와, 장비들이 대단하네요! 여기가 미래 학교인가요?"'},
+      {t:"F", txt:'"사람 냄새 나고 편안한 교실이네요."'}
+    ]
+  },
+  {
+    e:"📦", q:"서랍장 위 '교구 정리'는 어떻게 되어 있나요?",
+    a:[
+      {t:"A", txt:"같은 크기의 흰색 수납함에 라벨링까지 완벽."},
+      {t:"B", txt:"바구니마다 이름표 대신 나뭇잎 그림이 붙어 있음."},
+      {t:"C", txt:"투명 박스 안에 온갖 교구가 꽉꽉 들어차 있음."},
+      {t:"D", txt:"바구니 대신 예쁜 패브릭 천으로 덮어둠."},
+      {t:"E", txt:"모든 교구에 관리용 바코드가 붙어 있을 기세."},
+      {t:"F", txt:"열어보기 전까진 뭐가 들었는지 아무도 모름."}
+    ]
+  },
+  {
+    e:"💭", q:"내가 생각하는 '완벽한 교실'의 정의는?",
+    a:[
+      {t:"A", txt:"불필요한 것이 하나도 없는 정돈된 공간."},
+      {t:"B", txt:"생명력이 느껴지고 자연과 함께하는 공간."},
+      {t:"C", txt:"아이들의 꿈과 에너지가 가득 찬 풍요로운 공간."},
+      {t:"D", txt:"머무는 것만으로도 힐링이 되는 아름다운 공간."},
+      {t:"E", txt:"모든 활동이 효율적이고 스마트하게 이루어지는 공간."},
+      {t:"F", txt:"선생님과 아이들이 편하게 쉴 수 있는 친숙한 공간."}
+    ]
+  },
+  {
+    e:"🔍", q:"교내 '환경 정리 점검' 날이 다가온다면?",
+    a:[
+      {t:"A", txt:"평소랑 똑같다. 내 교실은 늘 완벽하니까."},
+      {t:"B", txt:"화분에 물 주고 시든 잎을 정리하며 정성을 들인다."},
+      {t:"C", txt:"떨어진 장식물을 다시 붙이고 게시판을 보강한다."},
+      {t:"D", txt:"조명 각도를 조절하고 소품 배치를 다시 한다."},
+      {t:"E", txt:"고장 난 전선을 정리하고 화면 인터페이스를 점검한다."},
+      {t:"F", txt:'"대청소 한 번 하고 "이 정도면 됐지"라며 퇴근한다.'}
+    ]
+  },
+  {
+    e:"🌙", q:"오늘 퇴근할 때 내 교실의 마지막 모습은?",
+    a:[
+      {t:"A", txt:"책상 위가 텅 빈 상태로 정적만이 흐름."},
+      {t:"B", txt:"창가 식물들이 달빛을 받으며 자라고 있음."},
+      {t:"C", txt:"내일 아이들과 할 활동 재료들이 책상마다 놓여 있음."},
+      {t:"D", txt:"은은한 무드등 하나가 켜져 있는 감성 공간."},
+      {t:"E", txt:"각종 기기들이 빨간 불을 깜빡이며 충전 중임."},
+      {t:"F", txt:"가방 챙겨 나가기 바빠서 기억도 안 남."}
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════
+   🏆  Result Types
+   ═══════════════════════════════════════ */
+const TYPES = {
+  A: { emoji:"🤍", cls:"type-A", label:"A유형",
+       title:"미니멀 마스터 – 교실계의 모델하우스",
+       desc:"군더더기 없는 깔끔함의 정석! 불필요한 시각적 자극을 최소화하여 아이들의 집중력을 높이는 정리의 달인입니다. 당신의 교실에는 빈 공간조차 디자인입니다.",
+       work:"'비우기'가 곧 꾸미기. 정리 정돈 A등급",
+       item:"고성능 라벨기와 무채색 수납함 세트" },
+  B: { emoji:"🌿", cls:"type-B", label:"B유형",
+       title:"숲속의 타잔 – 초록빛 식물 집사",
+       desc:"교실인지 식물원인지 헷갈릴 정도! 아이들에게 자연의 소중함을 몸소 보여주는 정서 치유형 선생님입니다. 피톤치드로 교실 공기는 항상 신선합니다.",
+       work:"식물 관리와 자연 체험 활동 전문",
+       item:"자동 급수 화분과 원목 받침대 세트" },
+  C: { emoji:"🎪", cls:"type-C", label:"C유형",
+       title:"만물상 주인장 – 창의력의 보물창고",
+       desc:'"선생님 이거 있어요?" 하면 다 나오는 마법의 공간! 아이들의 호기심을 자극하는 다양한 소품들로 가득한 열정 교실입니다. 빈틈은 곧 채울 공간입니다.',
+       work:"게시판 장식과 풍요로운 교실 환경 조성",
+       item:"튼튼한 5단 선반과 투명 정리함 세트" },
+  D: { emoji:"☕", cls:"type-D", label:"D유형",
+       title:"감성 카페 사장님 – 인스타 감성 교실",
+       desc:"조명, 향기, 소품까지 완벽! 머무는 것만으로도 마음이 편안해지는 힐링 공간을 만드는 분위기 메이커입니다. 학교 안의 작은 카페가 여기 있습니다.",
+       work:"교실 무드 연출과 아늑한 학습 환경 조성",
+       item:"패브릭 포스터와 무선 무드등 세트" },
+  E: { emoji:"🖥️", cls:"type-E", label:"E유형",
+       title:"미래 학교 연구원 – 얼리어답터의 실험실",
+       desc:"모든 것은 전선과 데이터로 통한다! 최신 테크 기기들을 활용해 수업 효율을 극대화하는 스마트 워커입니다. 아이들은 매 수업을 미래로 소풍 가는 느낌입니다.",
+       work:"에듀테크 수업 설계와 디지털 환경 구축",
+       item:"멀티 충전 스테이션과 선정리 벨크로 세트" },
+  F: { emoji:"🛋️", cls:"type-F", label:"F유형",
+       title:"생존형 자연인 – 사람 냄새 나는 방",
+       desc:"꾸밈보다는 실용성! 화려함은 없지만 누구나 편하게 발 뻗고 쉴 수 있는 가장 인간적인 공간입니다. 아이들이 가장 편하게 느끼는 교실이 바로 여기입니다.",
+       work:"편안하고 친근한 교실 분위기 유지",
+       item:"편안한 슬리퍼와 대용량 물티슈 세트" }
+};
+
+const TYPE_KEYS = ['A','B','C','D','E','F'];
+const TYPE_NAMES = ['미니멀형','정글형','맥시멀형','감성형','스마트형','실용형'];
+
+/* ═══════════════════════════════════════
+   🎮  Quiz Logic
+   ═══════════════════════════════════════ */
+let cur = 0;
+let sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+let lastRes = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${cur+1}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation='none'; sec.offsetHeight;
+  sec.style.animation='fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach((ans) => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${ans.t}</span><span>${ans.txt}</span>`;
+    b.onclick = () => pick(ans.t, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(type, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  sc[type]++;
+  playSelectSound();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  let maxVal = 0, winner = 'A';
+  TYPE_KEYS.forEach(k => { if (sc[k] > maxVal) { maxVal = sc[k]; winner = k; } });
+
+  const r = TYPES[winner];
+  lastRes = { r, winner, scores: {...sc} };
+
+  spawnConfetti();
+  playResultSound();
+
+  let barsHTML = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (sc[k]/12)*100;
+    barsHTML += `<div class="bar-row">
+      <span class="bar-label">${TYPE_NAMES[i]}</span>
+      <div class="bar-track"><div class="bar-fill bf-${k}" id="bf${k}" data-w="${pct}"></div></div>
+      <span class="bar-pts">${sc[k]}점</span>
+    </div>`;
+  });
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${r.emoji}</div>
+    <div class="res-type-badge ${r.cls}">${r.label}</div>
+    <div class="res-title">[ ${r.title} ]</div>
+    <div class="res-desc">${r.desc}</div>
+    <div class="res-info-row">
+      <div class="res-info-box work-box">
+        <div class="info-label">🌱 나의 교실 스타일</div>
+        <div class="info-value">${r.work}</div>
+      </div>
+      <div class="res-info-box item-box">
+        <div class="info-label">🎁 추천 인테리어 템</div>
+        <div class="info-value">${r.item}</div>
+      </div>
+    </div>
+    <div class="score-section">
+      <h3>📊 유형별 점수</h3>
+      ${barsHTML}
+    </div>
+    <div class="result-actions">
+      <button class="save-btn" id="saveBtn" onclick="saveResult()">내 인테리어 유형 저장하기 📸</button>
+      <button class="retry-btn" onclick="goHome()">다시 분석하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    TYPE_KEYS.forEach(k => {
+      const el = document.getElementById('bf'+k);
+      if (el) el.style.width = el.dataset.w + '%';
+    });
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if(c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if(old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#56ffc8','#69d98c','#a8d5b5','#ffb997','#ffd166','#c9b8f0','#7ec8e3','#b5ead7','#ffdac1','#e2f0cb'];
+  for(let i=0;i<90;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*9+5)+'px';
+    d.style.height = (Math.random()*9+5)+'px';
+    d.style.animationDuration = (Math.random()*2.5+2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6000);
+}
+
+/* ═══════════════════════════════════════
+   📸  Save Result
+   ═══════════════════════════════════════ */
+const capBgMap = {
+  'type-A':'linear-gradient(135deg,#0d1a14 0%,#1a2020 50%,#0d1a14 100%)',
+  'type-B':'linear-gradient(135deg,#0d1a14 0%,#0d2218 50%,#0d1a14 100%)',
+  'type-C':'linear-gradient(135deg,#0d1a14 0%,#261e00 50%,#0d1a14 100%)',
+  'type-D':'linear-gradient(135deg,#0d1a14 0%,#261508 50%,#0d1a14 100%)',
+  'type-E':'linear-gradient(135deg,#0d1a14 0%,#071e2a 50%,#0d1a14 100%)',
+  'type-F':'linear-gradient(135deg,#0d1a14 0%,#111a10 50%,#0d1a14 100%)',
+};
+
+const capBadgeBg = {
+  'type-A':'linear-gradient(135deg,#b0c4de,#778ca3)',
+  'type-B':'linear-gradient(135deg,#69d98c,#2e9e5b)',
+  'type-C':'linear-gradient(135deg,#ffd166,#f9a825)',
+  'type-D':'linear-gradient(135deg,#ffb997,#e8824a)',
+  'type-E':'linear-gradient(135deg,#7ec8e3,#3a8fa3)',
+  'type-F':'linear-gradient(135deg,#a8c5a0,#6b8c64)',
+};
+
+const capBadgeCol = {
+  'type-A':'#fff','type-B':'#fff','type-C':'#1a1200',
+  'type-D':'#fff','type-E':'#fff','type-F':'#fff',
+};
+
+async function saveResult() {
+  if (!lastRes) return;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중... ⏳';
+
+  const {r, winner, scores} = lastRes;
+
+  let barsH = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (scores[k]/12)*100;
+    barsH += `<div class="cap-br">
+      <span class="cap-bl">${TYPE_NAMES[i]}</span>
+      <div class="cap-bt"><div class="cap-bf" style="width:${pct}%"></div></div>
+      <span class="cap-bp">${scores[k]}</span>
+    </div>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'capture-card';
+  card.style.background = capBgMap[r.cls];
+  card.innerHTML = `
+    <div class="cap-emoji">${r.emoji}</div>
+    <div class="cap-badge" style="background:${capBadgeBg[r.cls]};color:${capBadgeCol[r.cls]}">${r.label}</div>
+    <div class="cap-title">[ ${r.title} ]</div>
+    <div class="cap-desc">${r.desc}</div>
+    <div class="cap-info-row">
+      <div class="cap-info-box cap-work">
+        <div class="cap-il">🌱 나의 교실 스타일</div>
+        <div class="cap-iv">${r.work}</div>
+      </div>
+      <div class="cap-info-box cap-item">
+        <div class="cap-il">🎁 추천 인테리어 템</div>
+        <div class="cap-iv">${r.item}</div>
+      </div>
+    </div>
+    <div class="cap-bars">${barsH}</div>
+    <div class="cap-wm">🪴 나의 교실 인테리어 성향 테스트 · 시리즈 6탄</div>
+  `;
+
+  document.body.appendChild(card);
+
+  try {
+    await new Promise(res => setTimeout(res, 300));
+    const canvas = await html2canvas(card, {
+      scale:2, backgroundColor:'#0d1a14',
+      useCORS:true, logging:false,
+      width:600, windowWidth:600
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `교실인테리어_${r.label}.png`, {type:'image/png'});
+        const shareData = {files:[file], title:'나의 교실 인테리어 성향 테스트', text:`나의 교실 인테리어 유형은 ${r.label}! - ${r.title}`};
+        try {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            card.remove();
+            btn.classList.remove('saving');
+            btn.textContent = '내 인테리어 유형 저장하기 📸';
+            return;
+          }
+        } catch(e){}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `교실인테리어_${r.label}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      card.remove();
+      btn.classList.remove('saving');
+      btn.innerHTML = '저장 완료! ✅';
+      setTimeout(()=>{ btn.textContent='내 인테리어 유형 저장하기 📸'; }, 2000);
+    }, 'image/png');
+
+  } catch(e) {
+    console.error('Capture failed:', e);
+    card.remove();
+    btn.classList.remove('saving');
+    btn.textContent = '내 인테리어 유형 저장하기 📸';
+    alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+  }
+}
+</script>
+</body>
+</html>

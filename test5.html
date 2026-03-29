@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ 나의 학부모 상담 전투력 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #160a28;
+  --bg-mid: #1e1035;
+  --bg-card: rgba(22,10,40,0.75);
+  --glass-border: rgba(200,150,255,0.18);
+  --glass-glow: rgba(180,120,255,0.06);
+  --violet: #c084fc;
+  --rose: #fb7185;
+  --amber: #fbbf24;
+  --sky: #67e8f9;
+  --lime: #a3e635;
+  --peach: #fdba74;
+  --text-white: #f5eeff;
+  --text-dim: rgba(245,238,255,0.48);
+  --text-mid: rgba(245,238,255,0.78);
+  --radius: 22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(130px);
+  z-index: 0;
+  pointer-events: none;
+}
+body::before {
+  width: 560px; height: 560px;
+  background: #9333ea;
+  opacity: 0.12;
+  top: -10%; right: -10%;
+  animation: orbA 22s ease-in-out infinite;
+}
+body::after {
+  width: 500px; height: 500px;
+  background: #ec4899;
+  opacity: 0.08;
+  bottom: -12%; left: -12%;
+  animation: orbB 26s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(-14vw, 20vh); }
+  66% { transform:translate(-7vw, 9vh); }
+}
+@keyframes orbB {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(16vw, -14vh); }
+  66% { transform:translate(9vw, -5vh); }
+}
+
+.grid-bg {
+  position: fixed; inset:0; z-index:0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(192,132,252,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(192,132,252,0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Sound Toggle */
+.sound-toggle {
+  position: fixed; top:18px; left:18px; z-index:500;
+  width:48px; height:48px; border-radius:50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(192,132,252,0.1);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.sound-toggle:hover { transform: scale(1.1); box-shadow: 0 0 28px rgba(251,113,133,0.2); }
+.sound-toggle .icon-on, .sound-toggle .icon-off {
+  position: absolute; transition: opacity 0.25s, transform 0.25s;
+}
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute; left:56px; top:50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.75);
+  color: var(--violet);
+  font-size: 0.72rem; font-weight:500;
+  padding: 5px 10px; border-radius:8px;
+  white-space: nowrap;
+  opacity:0; pointer-events:none; transition: opacity 0.2s;
+}
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+/* App */
+.app-container {
+  position: relative; z-index:1;
+  width: 100%; max-width: 700px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(192,132,252,0.08);
+  padding: 40px 32px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Start Screen */
+.start-screen { text-align:center; }
+.start-screen .emoji-hero {
+  font-size:76px; margin-bottom:14px; display:inline-block;
+  animation: heroFloat 2.5s ease-in-out infinite;
+}
+@keyframes heroFloat {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-14px) rotate(-4deg); }
+}
+.start-screen h1 {
+  font-family:'Gaegu',cursive;
+  font-size:2.2rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.35; margin-bottom:6px;
+}
+.start-screen h1 span {
+  background: linear-gradient(90deg, var(--violet), var(--rose));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.series-tag {
+  display:inline-block; padding:4px 14px; border-radius:20px;
+  background: rgba(192,132,252,0.1); border:1px solid rgba(192,132,252,0.28);
+  color: var(--violet); font-size:0.75rem; font-weight:700;
+  margin-bottom:16px; letter-spacing:0.5px;
+}
+
+/* Warning box */
+.warn-box {
+  background: rgba(251,113,133,0.08);
+  border: 1px solid rgba(251,113,133,0.22);
+  border-radius: 14px;
+  padding: 14px 18px; margin-bottom: 20px;
+  font-size: 0.84rem; color: var(--text-mid);
+  line-height: 1.7; word-break:keep-all;
+}
+.warn-box strong { color: var(--rose); }
+
+.start-screen .sub {
+  font-size:0.92rem; color: var(--text-mid);
+  line-height:1.75; margin-bottom:28px; word-break:keep-all;
+}
+.start-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 52px; border:none; border-radius:50px;
+  background: linear-gradient(135deg, var(--violet), var(--rose));
+  color: #fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.15rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow: 0 6px 28px rgba(192,132,252,0.3);
+  position:relative; overflow:hidden;
+}
+.start-btn::after {
+  content:''; position:absolute;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+  0% { transform:translateX(-100%) rotate(25deg); }
+  100% { transform:translateX(100%) rotate(25deg); }
+}
+.start-btn:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 12px 36px rgba(192,132,252,0.4); }
+
+/* Progress */
+.progress-wrap { width:100%; margin-bottom:22px; }
+.progress-info {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.progress-info .q-num {
+  font-family:'Gaegu',cursive; font-size:1.2rem; font-weight:700;
+  color: var(--violet);
+}
+.progress-info .q-count { font-size:0.85rem; color:var(--text-dim); font-weight:500; }
+.progress-bar-bg {
+  width:100%; height:10px;
+  background: rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;
+}
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--violet), var(--rose));
+  border-radius:10px; transition: width 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+/* Question */
+.question-section { animation: fadeSlide 0.45s ease both; }
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(36px); }
+  to { opacity:1; transform:translateX(0); }
+}
+.question-text {
+  font-size:1.05rem; font-weight:700;
+  color: var(--text-white); line-height:1.75; margin-bottom:24px;
+  word-break:keep-all;
+}
+.question-text .q-emoji { display:inline-block; margin-right:6px; font-size:1.3rem; }
+
+/* Answers */
+.answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.answer-btn {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:14px 15px;
+  border:1.5px solid rgba(192,132,252,0.1);
+  border-radius:16px; background:rgba(255,255,255,0.03);
+  cursor:pointer; transition:all 0.22s ease;
+  text-align:left; font-family:'Noto Sans KR',sans-serif;
+  font-size:0.83rem; color:var(--text-mid);
+  line-height:1.55; word-break:keep-all;
+}
+.answer-btn .num-badge {
+  flex-shrink:0; width:26px; height:26px; border-radius:50%;
+  background: linear-gradient(135deg, var(--violet), var(--rose));
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700; margin-top:1px;
+}
+.answer-btn:hover {
+  background:rgba(192,132,252,0.09); border-color:var(--violet);
+  transform:translateY(-2px); box-shadow:0 4px 18px rgba(192,132,252,0.12);
+  color:var(--text-white);
+}
+.answer-btn:active { transform:scale(0.97); }
+.answer-btn.picked {
+  background:rgba(251,113,133,0.12); border-color:var(--rose);
+  box-shadow:0 0 18px rgba(251,113,133,0.14); color:var(--rose);
+  pointer-events:none;
+}
+
+/* Result */
+.result-screen {
+  text-align:center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.8) translateY(28px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+.res-emoji {
+  font-size:88px; display:inline-block; margin-bottom:12px;
+  animation: emojiDance 1.2s ease-in-out infinite;
+}
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.12) rotate(-6deg); }
+  75% { transform:scale(1.12) rotate(6deg); }
+}
+
+/* Tier Badges */
+.res-tier-badge {
+  display:inline-block; padding:5px 20px; border-radius:12px;
+  font-family:'Gaegu',cursive; font-size:1rem; font-weight:700;
+  margin-bottom:6px; letter-spacing:1px;
+}
+.res-type-badge {
+  display:inline-block; padding:10px 36px; border-radius:50px;
+  font-family:'Gaegu',cursive; font-size:1.55rem; font-weight:700;
+  margin-bottom:8px;
+}
+.tier-S { background:linear-gradient(135deg,#ffd700,#ff8c00); color:#1a0a00; }
+.tier-A { background:linear-gradient(135deg,#c084fc,#9333ea); color:#fff; }
+.tier-B { background:linear-gradient(135deg,#67e8f9,#0891b2); color:#0c1a1f; }
+.tier-C { background:linear-gradient(135deg,#a3e635,#65a30d); color:#0a1a02; }
+.tier-D { background:linear-gradient(135deg,#fdba74,#ea580c); color:#1a0800; }
+.tier-F { background:linear-gradient(135deg,#94a3b8,#475569); color:#f1f5f9; }
+
+.type-A { background:linear-gradient(135deg,#ffd700,#ff8c00); color:#1a0a00; }
+.type-B { background:linear-gradient(135deg,#c084fc,#9333ea); color:#fff; }
+.type-C { background:linear-gradient(135deg,#67e8f9,#0891b2); color:#0c1a1f; }
+.type-D { background:linear-gradient(135deg,#a3e635,#65a30d); color:#0a1a02; }
+.type-E { background:linear-gradient(135deg,#fdba74,#ea580c); color:#1a0800; }
+.type-F { background:linear-gradient(135deg,#94a3b8,#475569); color:#f1f5f9; }
+
+.res-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.28rem; font-weight:700;
+  color:var(--violet); margin-bottom:8px;
+}
+.res-desc {
+  font-size:0.91rem; color:var(--text-mid);
+  line-height:1.85; margin-bottom:18px;
+  word-break:keep-all; padding:0 6px;
+}
+.res-info-row {
+  display:flex; gap:12px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:28px;
+}
+.res-info-box {
+  flex:1; min-width:200px; max-width:280px;
+  padding:14px 18px; border-radius:16px; text-align:left;
+}
+.res-info-box.work-box { background:rgba(192,132,252,0.08); border:1px solid rgba(192,132,252,0.22); }
+.res-info-box.item-box { background:rgba(251,113,133,0.08); border:1px solid rgba(251,113,133,0.22); }
+.info-label { font-size:0.7rem; font-weight:700; letter-spacing:0.5px; margin-bottom:4px; }
+.work-box .info-label { color:var(--violet); }
+.item-box .info-label { color:var(--rose); }
+.info-value { font-size:0.88rem; font-weight:700; color:var(--text-white); line-height:1.5; }
+
+/* Score Bars */
+.score-section { margin-bottom:28px; text-align:left; }
+.score-section h3 { font-size:0.85rem; font-weight:700; color:var(--text-mid); margin-bottom:14px; text-align:center; }
+.bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.bar-label { font-size:0.75rem; font-weight:700; color:var(--text-dim); min-width:62px; text-align:right; }
+.bar-track { flex:1; height:16px; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:10px; transition: width 1.1s cubic-bezier(.23,1,.32,1); width:0; }
+.bf-A { background:linear-gradient(90deg,#ffd700,#ff8c00); }
+.bf-B { background:linear-gradient(90deg,var(--violet),#9333ea); }
+.bf-C { background:linear-gradient(90deg,var(--sky),#0891b2); }
+.bf-D { background:linear-gradient(90deg,var(--lime),#65a30d); }
+.bf-E { background:linear-gradient(90deg,var(--peach),#ea580c); }
+.bf-F { background:linear-gradient(90deg,#94a3b8,#475569); }
+.bar-pts { font-size:0.78rem; font-weight:700; color:var(--text-dim); min-width:28px; }
+
+/* Action Buttons */
+.result-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.save-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, #9333ea, var(--violet));
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif; font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(147,51,234,0.3);
+}
+.save-btn:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(147,51,234,0.45); }
+.save-btn.saving { pointer-events:none; opacity:0.7; }
+.retry-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:15px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg, var(--violet), var(--rose));
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif; font-size:1.02rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 6px 22px rgba(251,113,133,0.3);
+}
+.retry-btn:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(251,113,133,0.4); }
+
+/* Capture Card */
+.capture-card {
+  position:fixed; left:-9999px; top:0;
+  width:600px; padding:48px 40px 40px;
+  border-radius:28px;
+  font-family:'Noto Sans KR',sans-serif;
+  text-align:center; z-index:-1;
+}
+.capture-card .cap-wm {
+  font-size:0.68rem; color:rgba(245,238,255,0.35);
+  margin-top:18px; letter-spacing:1px;
+}
+.capture-card .cap-emoji { font-size:68px; margin-bottom:10px; }
+.capture-card .cap-tier {
+  display:inline-block; padding:4px 16px; border-radius:10px;
+  font-family:'Gaegu',cursive; font-size:0.95rem; font-weight:700;
+  margin-bottom:6px; letter-spacing:1px;
+}
+.capture-card .cap-badge {
+  display:inline-block; padding:8px 30px; border-radius:50px;
+  font-family:'Gaegu',cursive; font-size:1.45rem; font-weight:700; margin-bottom:10px;
+}
+.capture-card .cap-title {
+  font-family:'Gaegu',cursive; font-size:1.1rem; font-weight:700;
+  color:var(--violet); margin-bottom:10px;
+}
+.capture-card .cap-desc {
+  font-size:0.83rem; color:rgba(245,238,255,0.78);
+  line-height:1.8; word-break:keep-all; margin-bottom:16px; padding:0 10px;
+}
+.capture-card .cap-info-row {
+  display:flex; gap:10px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:8px;
+}
+.capture-card .cap-info-box {
+  flex:1; min-width:180px; max-width:250px;
+  padding:10px 14px; border-radius:12px; text-align:left;
+}
+.capture-card .cap-work { background:rgba(192,132,252,0.12); border:1px solid rgba(192,132,252,0.28); }
+.capture-card .cap-item { background:rgba(251,113,133,0.12); border:1px solid rgba(251,113,133,0.28); }
+.capture-card .cap-il { font-size:0.65rem; font-weight:700; margin-bottom:2px; letter-spacing:0.5px; }
+.capture-card .cap-work .cap-il { color:var(--violet); }
+.capture-card .cap-item .cap-il { color:var(--rose); }
+.capture-card .cap-iv { font-size:0.82rem; font-weight:700; color:#fff; line-height:1.5; }
+.capture-card .cap-bars { text-align:left; margin-top:16px; }
+.capture-card .cap-br { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+.capture-card .cap-bl { font-size:0.68rem; font-weight:700; color:rgba(245,238,255,0.45); min-width:56px; text-align:right; }
+.capture-card .cap-bt { flex:1; height:12px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden; }
+.capture-card .cap-bf { height:100%; border-radius:6px; background:linear-gradient(90deg, var(--violet), var(--rose)); }
+.capture-card .cap-bp { font-size:0.68rem; font-weight:700; color:rgba(245,238,255,0.45); min-width:24px; }
+
+/* Confetti */
+.confetti-box {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:999; overflow:hidden;
+}
+.confetti-dot {
+  position:absolute; top:-20px; border-radius:3px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* Deco */
+.deco {
+  position:fixed; font-size:26px; opacity:0.06;
+  pointer-events:none; z-index:0;
+  animation: decoD 14s ease-in-out infinite;
+}
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-16px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:28px 18px; }
+  .start-screen h1 { font-size:1.65rem; }
+  .start-screen .emoji-hero { font-size:58px; }
+  .question-text { font-size:0.95rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.88rem; padding:13px 14px; }
+  .res-emoji { font-size:66px; }
+  .res-type-badge { font-size:1.28rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction:column; align-items:center; }
+  .res-info-row { flex-direction:column; align-items:center; }
+  .res-info-box { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<div class="deco" style="top:5%;left:6%;animation-delay:0s;">⚔️</div>
+<div class="deco" style="top:18%;right:5%;animation-delay:2s;">📋</div>
+<div class="deco" style="top:46%;left:2%;animation-delay:4s;">☕</div>
+<div class="deco" style="top:68%;right:4%;animation-delay:6s;">🛡️</div>
+<div class="deco" style="top:36%;left:91%;animation-delay:8s;">📞</div>
+<div class="deco" style="top:83%;left:8%;animation-delay:3s;">💬</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">⚔️</div>
+      <h1>나의 학부모 상담<br><span>전투력 테스트</span></h1>
+      <div class="series-tag">시리즈 5탄 · 상담 전투력 유형 테스트</div>
+      <div class="warn-box">
+        ⚠️ <strong>주의:</strong> 이 테스트는 상담 주간 생존자를 위한 것입니다.<br>
+        심장이 약하신 분들과 현재 상담 주간 중이신 분들은 심호흡 후 시작하세요.
+      </div>
+      <p class="sub">12가지 아찔한 상담 상황 속 당신의 선택은?<br>나의 상담 스타일은 철권? 성자? 아니면 방전?<br>⚔️ 6가지 전투 유형 중 나는 어디? ⚔️</p>
+      <button class="start-btn" onclick="beginQuiz()">전투 개시 ⚔️</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q1</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════
+   🔊  Sound Engine
+═══════════════════════════════ */
+let audioCtx = null, soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) { tog.classList.remove('muted'); tip.textContent = '효과음 ON'; playSelectSound(); }
+  else { tog.classList.add('muted'); tip.textContent = '효과음 OFF'; }
+}
+
+function playSelectSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const o1 = ctx.createOscillator(), g1 = ctx.createGain();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(660, now);
+    o1.frequency.exponentialRampToValueAtTime(880, now+0.05);
+    o1.frequency.exponentialRampToValueAtTime(440, now+0.1);
+    g1.gain.setValueAtTime(0.1, now);
+    g1.gain.exponentialRampToValueAtTime(0.001, now+0.13);
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.start(now); o1.stop(now+0.14);
+
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(1320, now+0.03);
+    o2.frequency.exponentialRampToValueAtTime(1980, now+0.1);
+    g2.gain.setValueAtTime(0.06, now+0.03);
+    g2.gain.exponentialRampToValueAtTime(0.001, now+0.15);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(now+0.03); o2.stop(now+0.16);
+  } catch(e){}
+}
+
+/* 결과 발표: 전투 승리 팡파레 */
+function playResultSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    // 드럼 타격음
+    const noise = ctx.createOscillator(), ng = ctx.createGain();
+    noise.type = 'sawtooth';
+    noise.frequency.setValueAtTime(200, now);
+    noise.frequency.exponentialRampToValueAtTime(40, now+0.15);
+    ng.gain.setValueAtTime(0.2, now);
+    ng.gain.exponentialRampToValueAtTime(0.001, now+0.2);
+    noise.connect(ng); ng.connect(ctx.destination);
+    noise.start(now); noise.stop(now+0.2);
+
+    // 승리 팡파레 음계
+    const melody = [{f:523,s:0.1},{f:659,s:0.22},{f:784,s:0.34},{f:1047,s:0.46},{f:784,s:0.56},{f:1047,s:0.64}];
+    melody.forEach(n => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(n.f, now+n.s);
+      g.gain.setValueAtTime(0, now+n.s);
+      g.gain.linearRampToValueAtTime(0.15, now+n.s+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, now+n.s+0.18);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now+n.s); o.stop(now+n.s+0.2);
+    });
+
+    // 인장 찍는 쾅 소리
+    const thud = ctx.createOscillator(), tg = ctx.createGain();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(150, now+0.9);
+    thud.frequency.exponentialRampToValueAtTime(60, now+1.05);
+    tg.gain.setValueAtTime(0.22, now+0.9);
+    tg.gain.exponentialRampToValueAtTime(0.001, now+1.1);
+    thud.connect(tg); tg.connect(ctx.destination);
+    thud.start(now+0.9); thud.stop(now+1.1);
+  } catch(e){}
+}
+
+/* ═══════════════════════════════
+   📝  Quiz Data — 12문항
+═══════════════════════════════ */
+// A=철권형 B=성자형 C=팩트형 D=회피형 E=전략형 F=방전형
+const QS = [
+  {
+    e:"📋", q:"상담 주간 첫날 아침, 예약 명단을 확인하는 나의 마음은?",
+    a:[
+      {t:"A", txt:'"누가 와도 다 꺾어주마. 덤벼라."'},
+      {t:"B", txt:'"모든 아이는 귀하다... 경청하자."'},
+      {t:"C", txt:'"기록물을 다 챙겼나? 데이터가 곧 힘이다."'},
+      {t:"D", txt:'"제발 큰 사건 없이 조용히 지나가길..."'},
+      {t:"E", txt:'"이분은 이런 스타일이니 이렇게 공략해야지."'},
+      {t:"F", txt:'"이미 기가 다 빨렸다. 집에 가고 싶다."'}
+    ]
+  },
+  {
+    e:"🤔", q:"\"우리 애는 집에서는 안 그러는데 학교에서 왜 그럴까요?\"",
+    a:[
+      {t:"A", txt:'"학교와 집은 엄연히 다릅니다. 여기선 이렇습니다."'},
+      {t:"B", txt:'"어머, 집에서는 참 착하군요! 학교 모습도 이해해봐요."'},
+      {t:"C", txt:'"최근 2주간 관찰 기록입니다. 여기 보시면..."'},
+      {t:"D", txt:'"허허, 아이들이 원래 두 얼굴이 있죠."'},
+      {t:"E", txt:'"부모님이 보시는 모습과 선생님이 보는 모습의 차이를 분석해볼까요?"'},
+      {t:"F", txt:'(먼 산을 보며) "그러게요... 참 신기하죠?"'}
+    ]
+  },
+  {
+    e:"😢", q:"상담 도중 학부모님이 갑자기 울음을 터뜨리신다면?",
+    a:[
+      {t:"A", txt:'"울음을 그치셔야 대화가 진행됩니다."'},
+      {t:"B", txt:"조용히 티슈를 건네며 같이 눈시울을 붉힌다."},
+      {t:"C", txt:"울음이 그칠 때까지 기다렸다가 다음 항목으로 넘어간다."},
+      {t:"D", txt:"당황해서 어쩔 줄 몰라 하며 같이 안절부절못한다."},
+      {t:"E", txt:"이 감정이 아이에게 미치는 영향을 심리학적으로 설명한다."},
+      {t:"F", txt:"'언제 끝날까...' 시계를 몰래 확인한다."}
+    ]
+  },
+  {
+    e:"😤", q:"\"옆 반 선생님은 숙제를 많이 내주시던데...\"라며 비교한다면?",
+    a:[
+      {t:"A", txt:'"학급 운영은 담임의 고유 권한입니다."'},
+      {t:"B", txt:'"그 반 스타일도 좋네요! 저희 반은 이런 장점이 있어요."'},
+      {t:"C", txt:'"숙제 양과 학업 성취도의 상관관계 데이터를 보여드릴까요?"'},
+      {t:"D", txt:'"아... 그래요? 참고해볼게요." (절대 안 함)'},
+      {t:"E", txt:'"옆 반과 저희 반의 교육 철학 차이를 설명해 드리죠."'},
+      {t:"F", txt:'"그럼 옆 반으로 가시지..." 속으로만 생각한다.'}
+    ]
+  },
+  {
+    e:"📱", q:"밤 10시에 긴 장문의 상담 요청 카톡이 왔을 때 나의 반응은?",
+    a:[
+      {t:"A", txt:"읽지 않고 다음 날 아침 업무 시간에 전화한다."},
+      {t:"B", txt:'"늦은 시간까지 고민이 많으시네요"라고 일단 답장한다.'},
+      {t:"C", txt:"'근무 시간 외 연락 자제' 문구를 프로필에 띄운다."},
+      {t:"D", txt:"심장이 두근거려 답장을 고민하다 밤을 설친다."},
+      {t:"E", txt:"예약 시스템 링크를 보내며 공식 절차를 안내한다."},
+      {t:"F", txt:"휴대폰을 비행기 모드로 바꾸고 잠든다."}
+    ]
+  },
+  {
+    e:"🩺", q:"\"우리 아이는 나중에 의사 시킬 건데, 공부 좀 더 시켜주세요.\"",
+    a:[
+      {t:"A", txt:'"공부보다 인성이 먼저입니다. 지금은 부족합니다."'},
+      {t:"B", txt:'"아이의 꿈이 멋지네요! 함께 응원하며 도와봐요."'},
+      {t:"C", txt:'"현재 전국 학업 성취도 기준을 말씀드리겠습니다."'},
+      {t:"D", txt:'"네, 네... 노력해볼게요." (하...😮‍💨)'},
+      {t:"E", txt:'"미래 역량은 국영수가 아니라 창의성에서 나옵니다."'},
+      {t:"F", txt:'"의사는 공부를 정말 잘해야 하는데... (침묵)."'}
+    ]
+  },
+  {
+    e:"🔍", q:"상담 중 아이의 친구 관계 문제를 집요하게 캐묻는 학부모님께는?",
+    a:[
+      {t:"A", txt:'"타 학생의 개인정보는 말씀드릴 수 없습니다."'},
+      {t:"B", txt:'"아이들이 스스로 해결할 수 있도록 믿고 기다려봐요."'},
+      {t:"C", txt:'"객관적인 갈등 발생 횟수와 양상을 정리해 드립니다."'},
+      {t:"D", txt:'"어휴, 요즘 애들 싸움이 칼로 물 베기죠 뭐."'},
+      {t:"E", txt:'"사회성 발달 단계상 자연스러운 과정임을 안내한다."'},
+      {t:"F", txt:'"저도 잘 모르겠네요. 애들끼리 노는 거라..."'}
+    ]
+  },
+  {
+    e:"👀", q:"상담실에 들어오는 학부모님의 첫인상만 보고 내가 하는 생각은?",
+    a:[
+      {t:"A", txt:"포스를 보니 만만치 않겠군. 기선제압이 필요해."},
+      {t:"B", txt:"인상이 좋으시네! 따뜻한 대화가 가능하겠어."},
+      {t:"C", txt:"목소리 톤을 보니 논리적인 설명이 잘 통할 것 같아."},
+      {t:"D", txt:"제발 화난 표정만 아니길... 살려주세요."},
+      {t:"E", txt:"입으신 옷이나 말투를 보니 상담 전략을 수정해야겠군."},
+      {t:"F", txt:"빨리 끝나고 다음 분 오셨으면 좋겠다."}
+    ]
+  },
+  {
+    e:"☕", q:"\"선생님, 커피 한 잔 사 왔는데 드시면서 하세요.\" (거절해야 하는 상황)",
+    a:[
+      {t:"A", txt:'"마음만 받겠습니다. 학교 규정상 절대 안 됩니다."'},
+      {t:"B", txt:'"어머 감사해요! 하지만 규칙이라 마음만 먹을게요~"'},
+      {t:"C", txt:'"청탁금지법 제0조 0항에 의거하여 반려합니다."'},
+      {t:"D", txt:'"아... 이걸 어쩌죠... 가져가셔야 하는데..."'},
+      {t:"E", txt:'"이런 정성보다 아이에 대한 관심이 더 큰 선물입니다."'},
+      {t:"F", txt:'"감사합니다. 하지만 저 지금 배불러요."'}
+    ]
+  },
+  {
+    e:"⏰", q:"상담이 끝날 시간이 됐는데 계속 이야기를 이어가려 한다면?",
+    a:[
+      {t:"A", txt:'"다음 상담자가 대기 중입니다. 이만 나가주세요."'},
+      {t:"B", txt:'"오늘 정말 유익했어요! 남은 이야기는 전화로 해요."'},
+      {t:"C", txt:'"약속된 20분이 지났습니다. 효율적인 시간 관리가 필요합니다."'},
+      {t:"D", txt:"끊지 못하고 계속 들어주다가 다음 상담이 다 꼬인다."},
+      {t:"E", txt:"시계를 가리키며 '우리 아이의 집중력처럼 시간도 한정적이죠'라며 돌려 깎기."},
+      {t:"F", txt:"멍하니 고개를 끄덕이며 영혼 없는 리액션을 한다."}
+    ]
+  },
+  {
+    e:"📝", q:"상담 결과 기록(상담록)을 작성할 때 나의 스타일은?",
+    a:[
+      {t:"A", txt:"핵심적인 문제점과 해결 방안 위주로 짧고 굵게."},
+      {t:"B", txt:"부모님의 고민과 나의 공감 내용을 감성적으로 기록."},
+      {t:"C", txt:"대화 내용을 거의 녹취 수준으로 디테일하게 데이터화."},
+      {t:"D", txt:"나중에 문제 생기지 않게 방어적으로 작성."},
+      {t:"E", txt:"아이의 발달 단계 변화를 분석적으로 기술."},
+      {t:"F", txt:'"상담 완료" 한 문장으로 끝내고 싶다.'}
+    ]
+  },
+  {
+    e:"🌙", q:"모든 상담이 끝난 금요일 퇴근길, 나의 상태는?",
+    a:[
+      {t:"A", txt:'"모든 적(민원)을 소탕했다." 승리자의 미소.'},
+      {t:"B", txt:'"부모님들과 더 가까워진 것 같아 뿌듯해."'},
+      {t:"C", txt:'"상담 데이터를 기반으로 학급 운영안을 수정해야지."'},
+      {t:"D", txt:'"살아남았다... 주말 내내 잠만 자야지."'},
+      {t:"E", txt:'"이번 상담 전략의 성공과 실패 요인을 복기한다."'},
+      {t:"F", txt:'"아무 생각도 안 난다. 내 이름이 뭐더라?"'}
+    ]
+  }
+];
+
+/* ═══════════════════════════════
+   🏆  Result Types
+═══════════════════════════════ */
+const TYPES = {
+  A: {
+    emoji:"⚔️", cls:"type-A", tierCls:"tier-S", tier:"S TIER",
+    label:"철권형",
+    title:"철권의 심판자 – 단호함 만렙",
+    desc:"선을 넘는 민원은 칼같이 차단! 원칙과 기강으로 교실을 수호하는 상담계의 대장군입니다. 학부모님들도 당신 앞에서는 절도 있게 행동합니다. 전국 모든 학교에 한 명씩은 꼭 필요한 인재입니다.",
+    work:"민원 대응, 학교폭력 상담, 생활지도부",
+    item:"법령집과 붉은색 결재인"
+  },
+  B: {
+    emoji:"😇", cls:"type-B", tierCls:"tier-A", tier:"A TIER",
+    label:"성자형",
+    title:"공감의 성자 – 상담실의 테레사",
+    desc:"학부모님의 마음까지 어루만지는 진정한 치유자. 당신과 상담하고 나면 학부모님들은 팬이 되어 돌아갑니다. 당신 덕분에 학교의 분위기가 부드럽게 유지됩니다.",
+    work:"학부모 교육, 상담부, 교육복지",
+    item:"따뜻한 허브차와 손수건"
+  },
+  C: {
+    emoji:"🧮", cls:"type-C", tierCls:"tier-B", tier:"B TIER",
+    label:"팩트형",
+    title:"논리 마스터 – 움직이는 데이터센터",
+    desc:"'카더라'는 통하지 않는다! 수치와 근거로 학부모님을 설득하는 브레인. 논리적인 반박 불가로 상담의 주도권을 잡습니다. 당신의 상담록은 예술의 경지입니다.",
+    work:"교육과정부, NEIS 담당, 학업 상담",
+    item:"레이저 포인터와 엑셀 단축키 일람표"
+  },
+  D: {
+    emoji:"🕊️", cls:"type-D", tierCls:"tier-C", tier:"C TIER",
+    label:"회피형",
+    title:"신중한 평화주의자 – 쿠션형 대화법",
+    desc:"좋은 게 좋은 것! 갈등을 피하고 평화를 유지하는 데 최선을 다합니다. 때로는 너무 조심스러워 본심을 숨기기도 하는 배려형 선생님입니다. 가끔은 NO라고 말해봐요!",
+    work:"학부모 연락, 행정업무 보조",
+    item:"노이즈 캔슬링 이어폰"
+  },
+  E: {
+    emoji:"🦊", cls:"type-E", tierCls:"tier-D", tier:"D TIER",
+    label:"전략형",
+    title:"제갈공명 쌤 – 심리전의 달인",
+    desc:"학부모님의 성향을 파악해 맞춤형 대화를 구사하는 여우 같은 전략가! 대화를 내가 원하는 방향으로 이끄는 기술이 탁월합니다. 그런데 가끔 너무 계산적이어서 피곤하지 않나요?",
+    work:"교육기획, 학부모 협의회, 홍보",
+    item:"심리학 서적과 고급 안경"
+  },
+  F: {
+    emoji:"💀", cls:"type-F", tierCls:"tier-F", tier:"F TIER",
+    label:"방전형",
+    title:"방전된 영혼 – 무념무상 모드",
+    desc:"'말은 하세요, 저는 듣고(만) 있습니다.' 이미 번아웃이 와서 모든 자극에 무뎌진 상태. 지금 당장 휴식이 절실합니다! 연차 신청서를 당장 꺼내세요. 선생님, 먼저 본인을 챙겨요 💜",
+    work:"과부하 중... 일단 쉬어요",
+    item:"연차 신청서와 고농축 비타민"
+  }
+};
+
+const TYPE_KEYS = ['A','B','C','D','E','F'];
+const TYPE_NAMES = ['철권형','성자형','팩트형','회피형','전략형','방전형'];
+
+/* ═══════════════════════════════
+   🎮  Quiz Logic
+═══════════════════════════════ */
+let cur = 0;
+let sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+let lastRes = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${cur+1}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation='none'; sec.offsetHeight;
+  sec.style.animation='fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach(ans => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${ans.t}</span><span>${ans.txt}</span>`;
+    b.onclick = () => pick(ans.t, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(type, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  sc[type]++;
+  playSelectSound();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  let maxVal = 0, winner = 'A';
+  TYPE_KEYS.forEach(k => { if (sc[k] > maxVal) { maxVal = sc[k]; winner = k; } });
+
+  const r = TYPES[winner];
+  lastRes = { r, winner, scores: {...sc} };
+
+  spawnConfetti();
+  playResultSound();
+
+  let barsHTML = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (sc[k]/12)*100;
+    barsHTML += `<div class="bar-row">
+      <span class="bar-label">${TYPE_NAMES[i]}</span>
+      <div class="bar-track"><div class="bar-fill bf-${k}" id="bf${k}" data-w="${pct}"></div></div>
+      <span class="bar-pts">${sc[k]}점</span>
+    </div>`;
+  });
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${r.emoji}</div>
+    <div class="res-tier-badge ${r.tierCls}">${r.tier}</div><br>
+    <div class="res-type-badge ${r.cls}">${r.label}</div>
+    <div class="res-title">[ ${r.title} ]</div>
+    <div class="res-desc">${r.desc}</div>
+    <div class="res-info-row">
+      <div class="res-info-box work-box">
+        <div class="info-label">💼 어울리는 업무</div>
+        <div class="info-value">${r.work}</div>
+      </div>
+      <div class="res-info-box item-box">
+        <div class="info-label">🎁 추천 아이템</div>
+        <div class="info-value">${r.item}</div>
+      </div>
+    </div>
+    <div class="score-section">
+      <h3>⚔️ 유형별 전투력 분포</h3>
+      ${barsHTML}
+    </div>
+    <div class="result-actions">
+      <button class="save-btn" id="saveBtn" onclick="saveResult()">결과 저장하기 📸</button>
+      <button class="retry-btn" onclick="goHome()">다시 전투하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    TYPE_KEYS.forEach(k => {
+      const el = document.getElementById('bf'+k);
+      if (el) el.style.width = el.dataset.w + '%';
+    });
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if(c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if(old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#c084fc','#fb7185','#fbbf24','#67e8f9','#a3e635','#fdba74','#f9a8d4','#6ee7b7','#93c5fd','#fde68a'];
+  for(let i=0;i<100;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*10+4)+'px';
+    d.style.height = (Math.random()*10+4)+'px';
+    d.style.animationDuration = (Math.random()*2.5+2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6500);
+}
+
+/* ═══════════════════════════════
+   📸  Save Result
+═══════════════════════════════ */
+const capBgMap = {
+  'type-A':'linear-gradient(135deg,#1a0a00 0%,#2a1500 50%,#160a28 100%)',
+  'type-B':'linear-gradient(135deg,#160a28 0%,#220a30 50%,#160a28 100%)',
+  'type-C':'linear-gradient(135deg,#001a20 0%,#0a2030 50%,#160a28 100%)',
+  'type-D':'linear-gradient(135deg,#0a1a00 0%,#112208 50%,#160a28 100%)',
+  'type-E':'linear-gradient(135deg,#1a0a00 0%,#2a1208 50%,#160a28 100%)',
+  'type-F':'linear-gradient(135deg,#0a0a14 0%,#141420 50%,#160a28 100%)',
+};
+
+const capBadgeBg = {
+  'type-A':'linear-gradient(135deg,#ffd700,#ff8c00)',
+  'type-B':'linear-gradient(135deg,#c084fc,#9333ea)',
+  'type-C':'linear-gradient(135deg,#67e8f9,#0891b2)',
+  'type-D':'linear-gradient(135deg,#a3e635,#65a30d)',
+  'type-E':'linear-gradient(135deg,#fdba74,#ea580c)',
+  'type-F':'linear-gradient(135deg,#94a3b8,#475569)',
+};
+
+const capBadgeCol = {
+  'type-A':'#1a0a00','type-B':'#fff','type-C':'#0c1a1f',
+  'type-D':'#0a1a02','type-E':'#1a0800','type-F':'#f1f5f9',
+};
+
+const tierLabels = {
+  'type-A':'S TIER','type-B':'A TIER','type-C':'B TIER',
+  'type-D':'C TIER','type-E':'D TIER','type-F':'F TIER',
+};
+
+const tierBg = {
+  'type-A':'linear-gradient(135deg,#ffd700,#ff8c00)',
+  'type-B':'linear-gradient(135deg,#c084fc,#9333ea)',
+  'type-C':'linear-gradient(135deg,#67e8f9,#0891b2)',
+  'type-D':'linear-gradient(135deg,#a3e635,#65a30d)',
+  'type-E':'linear-gradient(135deg,#fdba74,#ea580c)',
+  'type-F':'linear-gradient(135deg,#94a3b8,#475569)',
+};
+
+async function saveResult() {
+  if (!lastRes) return;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중... ⏳';
+
+  const {r, winner, scores} = lastRes;
+
+  let barsH = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (scores[k]/12)*100;
+    barsH += `<div class="cap-br">
+      <span class="cap-bl">${TYPE_NAMES[i]}</span>
+      <div class="cap-bt"><div class="cap-bf" style="width:${pct}%"></div></div>
+      <span class="cap-bp">${scores[k]}</span>
+    </div>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'capture-card';
+  card.style.background = capBgMap[r.cls];
+  card.innerHTML = `
+    <div class="cap-emoji">${r.emoji}</div>
+    <div class="cap-tier" style="background:${tierBg[r.cls]};color:${capBadgeCol[r.cls]};display:inline-block;padding:4px 16px;border-radius:10px;font-family:Gaegu,cursive;font-size:0.95rem;font-weight:700;margin-bottom:6px;letter-spacing:1px;">${tierLabels[r.cls]}</div><br>
+    <div class="cap-badge" style="background:${capBadgeBg[r.cls]};color:${capBadgeCol[r.cls]}">${r.label}</div>
+    <div class="cap-title">[ ${r.title} ]</div>
+    <div class="cap-desc">${r.desc}</div>
+    <div class="cap-info-row">
+      <div class="cap-info-box cap-work">
+        <div class="cap-il">💼 어울리는 업무</div>
+        <div class="cap-iv">${r.work}</div>
+      </div>
+      <div class="cap-info-box cap-item">
+        <div class="cap-il">🎁 추천 아이템</div>
+        <div class="cap-iv">${r.item}</div>
+      </div>
+    </div>
+    <div class="cap-bars">${barsH}</div>
+    <div class="cap-wm">⚔️ 나의 학부모 상담 전투력 테스트 · 시리즈 5탄</div>
+  `;
+
+  document.body.appendChild(card);
+
+  try {
+    await new Promise(res => setTimeout(res, 300));
+    const canvas = await html2canvas(card, {
+      scale:2, backgroundColor:'#160a28',
+      useCORS:true, logging:false,
+      width:600, windowWidth:600
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `상담전투력_${r.label}.png`, {type:'image/png'});
+        const shareData = {files:[file], title:'나의 학부모 상담 전투력 테스트', text:`나의 상담 유형은 ${r.label}! - ${r.title}`};
+        try {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            card.remove();
+            btn.classList.remove('saving');
+            btn.textContent = '결과 저장하기 📸';
+            return;
+          }
+        } catch(e){}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `상담전투력_${r.label}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      card.remove();
+      btn.classList.remove('saving');
+      btn.innerHTML = '저장 완료! ✅';
+      setTimeout(()=>{ btn.textContent='결과 저장하기 📸'; }, 2000);
+    }, 'image/png');
+
+  } catch(e) {
+    console.error('Capture failed:', e);
+    card.remove();
+    btn.classList.remove('saving');
+    btn.textContent = '결과 저장하기 📸';
+    alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+  }
+}
+</script>
+</body>
+</html>

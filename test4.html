@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 방학 증후군 유형 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--sky:#8dd9ff;--sky2:#b9ecff;--white:rgba(255,255,255,.84);--line:rgba(255,255,255,.55);--text:#124466;--dim:#4b6f88;--yellow:#ffd84f;--radius:24px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans KR",sans-serif;min-height:100vh;padding:18px 14px 36px;background:radial-gradient(circle at 84% 16%,rgba(255,250,200,.8) 0 7%,transparent 23%),linear-gradient(165deg,var(--sky2),var(--sky));color:var(--text);overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;border-radius:999px;filter:blur(80px);z-index:0;pointer-events:none}
+body:before{width:330px;height:330px;background:rgba(255,255,255,.7);top:-80px;left:-80px}
+body:after{width:360px;height:360px;background:rgba(255,216,79,.35);right:-130px;bottom:-120px}
+.fx{position:fixed;z-index:0;opacity:.25;font-size:34px;pointer-events:none;animation:float 6s ease-in-out infinite}
+.f1{left:5%;top:8%}.f2{right:6%;top:20%;animation-delay:1.3s}.f3{left:4%;top:62%;animation-delay:2.2s}.f4{right:5%;top:77%;animation-delay:3.2s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(6deg)}}
+.sound{position:fixed;left:14px;top:14px;z-index:30;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--white);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(22,94,145,.24);cursor:pointer}
+.sound .off{display:none}.sound.muted .on{display:none}.sound.muted .off{display:inline}
+.tip{position:absolute;left:52px;top:50%;transform:translateY(-50%);background:rgba(13,50,80,.85);color:#fff;font-size:.74rem;padding:4px 8px;border-radius:7px;white-space:nowrap;opacity:0;transition:.2s}
+.sound:hover .tip{opacity:1}
+.app{position:relative;z-index:1;max-width:760px;margin:0 auto}
+.card{display:none;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 20px 46px rgba(18,70,108,.18);backdrop-filter:blur(12px);padding:clamp(22px,4vw,34px)}
+.card.on{display:block;animation:up .4s ease both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.start{text-align:center}.tag{display:inline-block;font-size:.76rem;font-weight:800;background:rgba(255,255,255,.7);border:1px solid rgba(18,68,102,.15);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+.hero{font-size:76px;line-height:1;margin-bottom:8px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+h1{font-family:"Gaegu",cursive;font-size:clamp(2rem,5vw,2.7rem);line-height:1.22;margin-bottom:10px}
+h1 span{background:linear-gradient(90deg,#fff,#fff2ae);padding:0 8px;border-radius:10px}
+.sub{font-size:.95rem;line-height:1.6;color:var(--dim);margin-bottom:24px}
+button{font-family:inherit;border:none;border-radius:999px;font-weight:800;cursor:pointer}
+.start-btn{padding:14px 38px;background:linear-gradient(135deg,#fff5bc,var(--yellow));color:#735400;box-shadow:0 8px 18px rgba(175,131,0,.25)}
+.progress{margin-bottom:20px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.qnum{font-family:"Gaegu",cursive;font-size:1.3rem;font-weight:700;color:#166b9e}
+.dday{font-size:.8rem;font-weight:900;color:#aa7700;background:rgba(255,216,79,.33);padding:4px 9px;border-radius:999px;border:1px solid rgba(170,119,0,.15)}
+.barbg{height:11px;background:rgba(255,255,255,.8);border-radius:999px;overflow:hidden}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--yellow),#ffa84b);box-shadow:0 0 14px rgba(255,180,76,.4);transition:.45s}
+.q{font-size:clamp(1.04rem,2vw,1.26rem);line-height:1.55;font-weight:700;margin-bottom:14px}
+.answers{display:grid;gap:10px}
+.ans{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:13px 12px;border:1.4px solid rgba(18,68,102,.15);border-radius:16px;background:rgba(255,255,255,.9);font-size:.93rem;line-height:1.5;color:var(--text);transition:.2s}
+.ans:hover{border-color:rgba(23,108,160,.4);transform:translateY(-1px)}
+.ans.pick{background:#fff6ca;border-color:rgba(246,191,46,.9)}
+.ab{min-width:27px;width:27px;height:27px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;background:linear-gradient(135deg,#e9f6ff,#bee8ff)}
+.res{text-align:center}.ic{font-size:62px;margin-bottom:6px}
+.badge{display:inline-block;font-size:.82rem;font-weight:900;border-radius:999px;padding:6px 13px;margin-bottom:8px}
+.type-A{background:linear-gradient(135deg,#9be2ff,#69bff2);color:#02385d}.type-B{background:linear-gradient(135deg,#c7f0ff,#8cd8ff);color:#044266}.type-C{background:linear-gradient(135deg,#fff6c1,#ffe07e);color:#745100}.type-D{background:linear-gradient(135deg,#a6edff,#70c8ff);color:#003d69}.type-E{background:linear-gradient(135deg,#fff5b6,#ffd75f);color:#6e4d00}.type-F{background:linear-gradient(135deg,#d8f1ff,#9fd9f4);color:#0f466a}
+.rt{font-family:"Gaegu",cursive;font-size:clamp(1.68rem,4vw,2.15rem);line-height:1.25;margin-bottom:8px}
+.rs{font-size:.86rem;font-weight:700;color:#447090;margin-bottom:12px}
+.box{background:rgba(255,255,255,.76);border:1px solid rgba(18,68,102,.12);border-radius:14px;padding:12px;text-align:left;font-size:.94rem;line-height:1.6;margin-bottom:10px}
+.rest{background:linear-gradient(135deg,rgba(255,245,193,.92),rgba(255,222,117,.72));border-color:rgba(158,109,0,.2);color:#674800;font-weight:700}
+.score{margin-top:9px}.st{font-size:.88rem;font-weight:800;color:#2d678c;margin-bottom:9px}
+.r{display:grid;grid-template-columns:50px 1fr 36px;align-items:center;gap:8px;margin-bottom:7px}
+.r:last-child{margin-bottom:0}.lb,.pt{font-size:.8rem;font-weight:700;color:#355e79}
+.trk{height:8px;background:rgba(13,58,88,.1);border-radius:999px;overflow:hidden}
+.bf{height:100%;width:0;border-radius:inherit;transition:.6s}.bf-A{background:linear-gradient(90deg,#6fc7f5,#30a1dd)}.bf-B{background:linear-gradient(90deg,#9ddfff,#5ec2f6)}.bf-C{background:linear-gradient(90deg,#ffe987,#ffca3f)}.bf-D{background:linear-gradient(90deg,#89dfff,#3cb2ed)}.bf-E{background:linear-gradient(90deg,#ffdf71,#ffc239)}.bf-F{background:linear-gradient(90deg,#abdff9,#68bce8)}
+.tie{margin-top:8px;font-size:.77rem;font-weight:700;color:#557a95;text-align:left}
+.act{margin-top:14px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.save{padding:11px 20px;background:linear-gradient(135deg,#fff4b6,#ffd44b);color:#705000;box-shadow:0 8px 14px rgba(172,129,0,.2)}
+.retry{padding:11px 18px;background:linear-gradient(135deg,#f3f9ff,#d8f0ff);color:#12567f;border:1px solid rgba(18,86,127,.2)}
+.save.saving{opacity:.76;pointer-events:none}
+.burst{position:fixed;inset:0;z-index:20;pointer-events:none;overflow:hidden}
+.piece{position:absolute;top:-10%;font-size:20px;opacity:.82;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(120vh) rotate(420deg);opacity:.1}}
+.cap{position:fixed;left:-9999px;top:0;width:620px;padding:26px;border-radius:24px;color:#0f4369;background:radial-gradient(circle at 14% 14%,rgba(255,255,255,.88) 0 10%,transparent 32%),linear-gradient(165deg,#b9ebff,#8fdcff);box-shadow:0 28px 56px rgba(12,66,101,.25)}
+.ci{text-align:center;font-size:60px;margin-bottom:8px}.cb{display:inline-block;font-size:.81rem;font-weight:900;border-radius:999px;padding:6px 12px;margin-bottom:8px}
+.ct{text-align:center;font-family:"Gaegu",cursive;font-size:2rem;margin-bottom:5px}.cs{text-align:center;font-size:.85rem;font-weight:700;color:#2f6f96;margin-bottom:11px}
+.cd{background:rgba(255,255,255,.76);border:1px solid rgba(16,66,101,.15);border-radius:12px;padding:11px;line-height:1.58;font-size:.92rem;margin-bottom:9px}
+.cr{background:rgba(255,235,158,.84);border:1px solid rgba(140,100,0,.2);border-radius:11px;padding:9px 11px;font-size:.87rem;font-weight:700;color:#624600;margin-bottom:9px}
+.br{display:grid;grid-template-columns:50px 1fr 30px;gap:8px;align-items:center;margin-bottom:6px}.br:last-child{margin-bottom:0}
+.bt{height:7px;background:rgba(15,67,105,.16);border-radius:999px;overflow:hidden}.ff{height:100%;border-radius:inherit}
+.wf{margin-top:12px;text-align:center;font-size:.73rem;font-weight:700;color:rgba(15,67,105,.7)}
+@media (max-width:720px){.r{grid-template-columns:44px 1fr 30px}.save,.retry{width:100%}}
+</style>
+</head>
+<body>
+<div class="fx f1">🌴</div><div class="fx f2">☃️</div><div class="fx f3">🌞</div><div class="fx f4">🌊</div>
+<button class="sound" id="sound" onclick="toggleSound()" aria-label="사운드 토글"><span class="on">🔊</span><span class="off">🔇</span><span class="tip" id="tip">효과음 ON</span></button>
+<main class="app">
+  <section class="card on" id="start">
+    <div class="start">
+      <div class="tag">시리즈 4탄 · 방학 특집</div>
+      <div class="hero">🏖️</div>
+      <h1>나의 <span>방학 증후군</span><br>유형 테스트</h1>
+      <p class="sub">초등교사 전용 해방감 진단 테스트.<br>12문항으로 알아보는 당신의 방학 본캐를 확인하세요.</p>
+      <button class="start-btn" onclick="beginQuiz()">테스트 시작하기</button>
+    </div>
+  </section>
+  <section class="card" id="quiz">
+    <div class="progress">
+      <div class="head"><span class="qnum" id="qnum">Q1 / 12</span><span class="dday" id="dday">해방 카운트다운 D-12</span></div>
+      <div class="barbg"><div class="bar" id="bar"></div></div>
+    </div>
+    <div class="q" id="q"></div>
+    <div class="answers" id="answers"></div>
+  </section>
+  <section class="card" id="result"><div class="res" id="res"></div></section>
+</main>
+<script>
+const K=["A","B","C","D","E","F"];
+const M={A:{n:"계획형",c:"type-A",b:"bf-A"},B:{n:"침대일체형",c:"type-B",b:"bf-B"},C:{n:"자기계발형",c:"type-C",b:"bf-C"},D:{n:"역마살형",c:"type-D",b:"bf-D"},E:{n:"현생복구형",c:"type-E",b:"bf-E"},F:{n:"학교그리움형",c:"type-F",b:"bf-F"}};
+const QS=[
+{e:"📅",q:"방학 D-30일, 당신의 상태는?",a:[{t:"A",x:"이미 엑셀로 일자별 여행 계획표를 완성했다."},{t:"B",x:"\"아직 멀었네...\" 하며 달력만 무한 클릭한다."},{t:"C",x:"방학 때 들을 연수 리스트를 장바구니에 담는다."},{t:"D",x:"최저가 항공권 페이지를 수시로 들락날락한다."},{t:"E",x:"방학 때 밀린 잠을 자기 위해 암막 커튼을 주문한다."},{t:"F",x:"\"애들이랑 헤어질 생각하니 벌써 아쉽네\" (희귀종)."}]},
+{e:"📝",q:"방학 전 마지막 성적 처리와 통지표 작성 중인 당신?",a:[{t:"A",x:"오타 검수 3회 실시, 완벽한 문장으로 마무리한다."},{t:"B",x:"\"다 잘함\"으로 통일하고 싶은 욕구를 간신히 참는다."},{t:"C",x:"아이들의 성장을 보며 감동의 눈물 한 방울 흘린다."},{t:"D",x:"창밖의 날씨를 보며 '여길 탈출하고 싶다'고 생각한다."},{t:"E",x:"마감 10분 전, 초인적인 힘으로 타이핑을 마친다."},{t:"F",x:"하나하나 정성껏 쓰느라 매일 야근한다."}]},
+{e:"🏫",q:"방학식 당일, 아이들을 모두 보내고 텅 빈 교실에 혼자 남았다면?",a:[{t:"A",x:"내년 교실 배치를 구상하며 사진을 찍어둔다."},{t:"B",x:"일단 의자에 길게 누워 30분간 명상(취침)한다."},{t:"C",x:"밀린 업무 메신저를 싹 정리하고 전원을 끈다."},{t:"D",x:"가방 싸서 1초 만에 학교 정문을 통과한다."},{t:"E",x:"\"살았다...\" 소리 지르며 동료 샘과 하이파이브한다."},{t:"F",x:"아이들이 두고 간 물건이 없나 애틋하게 살핀다."}]},
+{e:"🌅",q:"방학 1일 차 아침, 눈을 떴을 때 당신의 행동은?",a:[{t:"A",x:"오전 8시, 계획했던 조깅을 나간다."},{t:"B",x:"오후 2시까지 눈만 감고 침대와 하나가 된다."},{t:"C",x:"유튜브로 '1주일 만에 파이썬 마스터' 영상을 클릭한다."},{t:"D",x:"이미 공항이거나 고속도로 위다."},{t:"E",x:"밀린 집안일을 하며 '사람 사는 집'으로 만든다."},{t:"F",x:"나도 모르게 학교 가는 시간에 눈이 떠져서 괴로워한다."}]},
+{e:"📱",q:"방학 중 동료 선생님에게 업무 연락이 온다면?",a:[{t:"A",x:"\"예상했던 질문이군요\" 바로 자료를 찾아 보내준다."},{t:"B",x:"읽고 씹었다가 3일 뒤에 \"죄송해요 이제 봤어요\" 한다."},{t:"C",x:"\"우리 방학에도 스터디 할까요?\"라고 역제안한다."},{t:"D",x:"\"저 지금 해외라 로밍이 안 돼서...\" (거짓말)."},{t:"E",x:"\"제발 방학엔 학교 잊게 해주세요\" 눈물을 흘린다."},{t:"F",x:"반갑게 전화를 받아 1시간 동안 수다를 떤다."}]},
+{e:"🍽️",q:"방학 중 식사는 어떻게 해결하는가?",a:[{t:"A",x:"밀키트와 식단표를 짜서 건강하게 챙겨 먹는다."},{t:"B",x:"배달 앱 VIP가 되거나 삼시 세끼 라면이다."},{t:"C",x:"유명 맛집 줄 서서 기다리며 미식 여행을 즐긴다."},{t:"D",x:"현지 음식(고수 가득)을 먹으며 이국적 정취를 느낀다."},{t:"E",x:"집 냉장고를 털어 '냉파' 요리의 달인이 된다."},{t:"F",x:"\"아... 누가 급식 좀 차려줬으면...\" 급식실을 그리워한다."}]},
+{e:"🎯",q:"방학을 맞아 결심한 '취미 생활'은?",a:[{t:"A",x:"자격증 공부 또는 대학원 논문 쓰기."},{t:"B",x:"넷플릭스 전 시리즈 정주행하기."},{t:"C",x:"헬스, 요가 등 건강한 신체 만들기."},{t:"D",x:"원데이 클래스 투어 (베이킹, 가죽공예 등)."}, {t:"E",x:"미뤄둔 정수기 필터 교체 및 에어컨 청소."},{t:"F",x:"다음 학기 수업 교구 미리 만들기."}]},
+{e:"🚶",q:"길을 가다 우연히 우리 반 학생을 만났다면?",a:[{t:"A",x:"\"공부 열심히 하고 있니?\" 학습 체크 들어간다."},{t:"B",x:"\"누구지?\" 못 본 척 고개를 돌리고 전력 질주한다."},{t:"C",x:"반갑게 인사하고 맛있는 간식을 사준다."},{t:"D",x:"선글라스와 마스크로 완벽 변장해 정체를 숨긴다."},{t:"E",x:"\"안녕! 선생님 지금 바빠서!\" 짧게 인사하고 도망친다."},{t:"F",x:"아이 손을 잡고 30분 동안 학교 얘기를 한다."}]},
+{e:"💙",q:"방학 중 가장 행복한 순간은 언제인가?",a:[{t:"A",x:"계획표의 모든 항목에 체크 표시를 할 때."},{t:"B",x:"평일 낮 2시에 낮잠 자다 깼는데 또 잘 수 있을 때."},{t:"C",x:"새로운 지식을 습득해 뇌가 꽉 차는 기분이 들 때."},{t:"D",x:"낯선 도시의 거리에서 자유를 느낄 때."},{t:"E",x:"집이 먼지 하나 없이 깨끗하게 정리되었을 때."},{t:"F",x:"개학이 다가와 아이들 얼굴 볼 생각할 때."}]},
+{e:"⏳",q:"방학 D-7일, 개학이 일주일 앞으로 다가왔다면?",a:[{t:"A",x:"새 학기 수업 자료와 환경 정리 구상을 마친다."},{t:"B",x:"\"아직 일주일이나 남았어\"라며 현실을 부정한다."},{t:"C",x:"개학 때 아이들에게 보여줄 PPT를 제작한다."},{t:"D",x:"마지막 땡처리 여행 상품이 있는지 검색한다."},{t:"E",x:"서서히 수면 시간을 학교 스케줄로 맞추기 시작한다."},{t:"F",x:"아이들에게 보낼 '개학 안내 문자'를 정성껏 쓴다."}]},
+{e:"🌙",q:"개학 전날 밤, 당신의 꿈은?",a:[{t:"A",x:"수업을 완벽하게 진행해 박수받는 꿈."},{t:"B",x:"학교에 지각해서 복도를 맨발로 뛰는 악몽."},{t:"C",x:"아이들이 한 명도 안 오는 꿈 (길몽?)."},{t:"D",x:"비행기가 결항되어 강제로 방학이 연장되는 꿈."},{t:"E",x:"교실 문이 안 열려서 밖에서 헤매는 꿈."},{t:"F",x:"아이들과 웃으며 간식 파티하는 꿈."}]},
+{e:"🚪",q:"개학 날 아침, 다시 학교 정문을 통과할 때의 기분은?",a:[{t:"A",x:"\"자, 다시 시작해보자!\" 비장한 각오."},{t:"B",x:"\"도살장에 끌려가는 기분이 이런 걸까?\""},{t:"C",x:"\"방학 동안 나 정말 많이 성장했어\" 뿌듯함."},{t:"D",x:"\"다음 방학까지 D-120일... 카운트다운 시작.\""}, {t:"E",x:"\"학교 냄새... 익숙한 지옥의 향기군.\""}, {t:"F",x:"\"얘들아 보고 싶었어!!\" (진심 200%)."}]}
+];
+const RES={
+A:{l:"A유형",t:"갓생 마스터 - 방학은 성장의 시간",s:"계획형",i:"📅",d:"방학조차 1분 1초 허투루 쓰지 않는 철저한 계획가! 개학할 때 가장 레벨업 되어 돌아오는 선생님입니다.",r:"30분 단위로 쪼개진 일정표 클리어하기."},
+B:{l:"B유형",t:"나무늘보 요정 - 침대와 물아일체",s:"침대일체형",i:"🛌",d:"학교에서 소진한 모든 에너지를 '광합성'과 '수면'으로 채우는 타입. 방학 동안 이동 거리가 총 1km도 안 될 수 있습니다.",r:"스마트폰 거치대와 극세사 이불."},
+C:{l:"C유형",t:"공부 귀신 - 연수 수집가",s:"자기계발형",i:"📚",d:"방학은 쉴 시간이 아니라 배우는 시간! 각종 연수와 스터디로 뇌를 풀가동하는 열정 만점 선생님입니다.",r:"1+1 자격증 패키지 연수."},
+D:{l:"D유형",t:"노마드 쌤 - 전생에 마르코 폴로",s:"역마살형",i:"✈️",d:"학교 담장 밖 세상을 향한 갈망이 가장 큰 분! 방학식 날 공항으로 직행하는 당신은 진정한 자유 영혼입니다.",r:"오지 탐험 또는 한 달 살기."},
+E:{l:"E유형",t:"현생 복구사 - 집안일 퀘스트 중",s:"현생복구형",i:"🧹",d:"학기 중에 돌보지 못한 '나의 삶'과 '나의 집'을 복구하는 데 진심인 분. 청소와 정리를 통해 카타르시스를 느낍니다.",r:"고성능 스팀 청소기와 수납함 정리."},
+F:{l:"F유형",t:"아이들 바라기 - 100% 참스승",s:"학교그리움형",i:"🧡",d:"방학 중에도 아이들 사진을 꺼내 보며 미소 짓는 당신... 혹시 천사인가요? 동료 교사들 사이에서 '유니콘'이라 불리는 귀한 존재입니다.",r:"아이들과의 추억 앨범 정리."}
+};
+let ac=null,on=true,cur=0,sc=init(),last=null;
+function init(){return{A:0,B:0,C:0,D:0,E:0,F:0}}
+function ctx(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}
+function toggleSound(){on=!on;const b=document.getElementById("sound"),t=document.getElementById("tip");b.classList.toggle("muted",!on);t.textContent=on?"효과음 ON":"효과음 OFF";if(on)tick()}
+function tick(){if(!on)return;try{const c=ctx(),n=c.currentTime,p=(f,s,d,g)=>{const o=c.createOscillator(),v=c.createGain();o.type="square";o.frequency.setValueAtTime(f,s);o.frequency.exponentialRampToValueAtTime(f*.82,s+d);v.gain.setValueAtTime(g,s);v.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(v);v.connect(c.destination);o.start(s);o.stop(s+d)};p(1800,n,.035,.06);p(980,n+.09,.055,.07)}catch(e){}}
+function wave(){if(!on)return;try{const c=ctx(),n=c.currentTime,len=c.sampleRate*1.5,buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);const ns=c.createBufferSource();ns.buffer=buf;const f=c.createBiquadFilter();f.type="lowpass";f.frequency.setValueAtTime(700,n);f.frequency.linearRampToValueAtTime(1800,n+1.2);const g=c.createGain();g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.11,n+.3);g.gain.exponentialRampToValueAtTime(.001,n+1.45);ns.connect(f);f.connect(g);g.connect(c.destination);ns.start(n);ns.stop(n+1.5);const o=c.createOscillator(),gv=c.createGain();o.type="sine";o.frequency.setValueAtTime(420,n+.15);o.frequency.exponentialRampToValueAtTime(170,n+1);gv.gain.setValueAtTime(.0001,n+.15);gv.gain.exponentialRampToValueAtTime(.08,n+.28);gv.gain.exponentialRampToValueAtTime(.001,n+1.1);o.connect(gv);gv.connect(c.destination);o.start(n+.15);o.stop(n+1.1)}catch(e){}}
+function plane(){if(!on)return;try{const c=ctx(),n=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type="sawtooth";o.frequency.setValueAtTime(70,n);o.frequency.exponentialRampToValueAtTime(340,n+1.8);g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.12,n+.45);g.gain.exponentialRampToValueAtTime(.001,n+2);o.connect(g);g.connect(c.destination);o.start(n);o.stop(n+2);const o2=c.createOscillator(),g2=c.createGain();o2.type="triangle";o2.frequency.setValueAtTime(340,n+.6);o2.frequency.exponentialRampToValueAtTime(840,n+1.9);g2.gain.setValueAtTime(.0001,n+.6);g2.gain.exponentialRampToValueAtTime(.05,n+1);g2.gain.exponentialRampToValueAtTime(.001,n+2);o2.connect(g2);g2.connect(c.destination);o2.start(n+.6);o2.stop(n+2)}catch(e){}}
+function rSound(t){t==="D"?plane():wave()}
+function show(id){["start","quiz","result"].forEach(x=>document.getElementById(x).classList.remove("on"));document.getElementById(id).classList.add("on")}
+function beginQuiz(){cur=0;sc=init();last=null;show("quiz");render()}
+function render(){const d=QS[cur];document.getElementById("qnum").textContent=`Q${cur+1} / ${QS.length}`;document.getElementById("dday").textContent=`해방 카운트다운 D-${QS.length-cur}`;document.getElementById("bar").style.width=`${(cur/QS.length)*100}%`;document.getElementById("q").innerHTML=`${d.e} ${d.q}`;const g=document.getElementById("answers");g.innerHTML="";d.a.forEach((it,i)=>{const b=document.createElement("button");b.className="ans";b.innerHTML=`<span class="ab">${String.fromCharCode(65+i)}</span><span>${it.x}</span>`;b.onclick=()=>pick(it.t,b);g.appendChild(b)})}
+function pick(t,b){document.querySelectorAll(".ans").forEach(x=>x.classList.remove("pick"));b.classList.add("pick");sc[t]++;tick();setTimeout(()=>{cur++;cur>=QS.length?result():render()},280)}
+function winner(){let w=K[0];K.forEach(k=>{if(sc[k]>sc[w])w=k});return w}
+function result(){show("result");document.getElementById("bar").style.width="100%";document.getElementById("dday").textContent="해방 카운트다운 D-0";const w=winner(),r=RES[w],tie=K.filter(k=>sc[k]===sc[w]);last={w,r,sc:{...sc},tie};rSound(w);burst();const bars=K.map(k=>{const p=Math.round(sc[k]/QS.length*100);return`<div class="r"><span class="lb">${k}</span><div class="trk"><div class="bf ${M[k].b}" id="b-${k}" data-w="${p}%"></div></div><span class="pt">${sc[k]}점</span></div>`}).join("");const tieTxt=tie.length>1?`<div class="tie">동점 유형: ${tie.join(", ")} (시리즈 규칙상 ${w} 우선)</div>`:"";document.getElementById("res").innerHTML=`<div class="ic">${r.i}</div><div class="badge ${M[w].c}">${r.l} · ${r.s}</div><h2 class="rt">[ ${r.t} ]</h2><div class="rs">방학 본캐 판정 완료</div><div class="box">${r.d}</div><div class="box rest">추천 휴식: ${r.r}</div><div class="box score"><div class="st">유형별 점수 분포</div>${bars}${tieTxt}</div><div class="act"><button class="save" id="save" onclick="saveResult()">내 방학 계획 저장하기</button><button class="retry" onclick="home()">다시 테스트하기</button></div>`;setTimeout(()=>K.forEach(k=>{const el=document.getElementById(`b-${k}`);if(el)el.style.width=el.dataset.w}),160)}
+function home(){const b=document.querySelector(".burst");if(b)b.remove();show("start")}
+function burst(){const o=document.querySelector(".burst");if(o)o.remove();const b=document.createElement("div");b.className="burst";document.body.appendChild(b);const arr=["🌴","☀️","🌊","✈️","☃️","🍉"];for(let i=0;i<34;i++){const p=document.createElement("div");p.className="piece";p.textContent=arr[Math.floor(Math.random()*arr.length)];p.style.left=`${Math.random()*100}%`;p.style.animationDuration=`${2.5+Math.random()*2.5}s`;p.style.animationDelay=`${Math.random()*.6}s`;b.appendChild(p)}setTimeout(()=>b.remove(),4600)}
+function bStyle(c){if(c==="type-A")return"background:linear-gradient(135deg,#9be2ff,#69bff2);color:#02385d";if(c==="type-B")return"background:linear-gradient(135deg,#c7f0ff,#8cd8ff);color:#044266";if(c==="type-C")return"background:linear-gradient(135deg,#fff6c1,#ffe07e);color:#745100";if(c==="type-D")return"background:linear-gradient(135deg,#a6edff,#70c8ff);color:#003d69";if(c==="type-E")return"background:linear-gradient(135deg,#fff5b6,#ffd75f);color:#6e4d00";return"background:linear-gradient(135deg,#d8f1ff,#9fd9f4);color:#0f466a"}
+async function saveResult(){if(!last)return;if(typeof html2canvas==="undefined"){alert("저장 라이브러리 로딩 실패. 잠시 후 다시 시도해주세요.");return}const btn=document.getElementById("save");if(!btn||btn.classList.contains("saving"))return;btn.classList.add("saving");btn.textContent="이미지 저장 중...";const{w,r,sc}=last,cls=M[w].c;const bars=K.map(k=>{const p=Math.round(sc[k]/QS.length*100);return`<div class="br"><span>${k}</span><div class="bt"><div class="ff ${M[k].b}" style="width:${p}%"></div></div><span>${sc[k]}</span></div>`}).join("");const card=document.createElement("div");card.className="cap";card.innerHTML=`<div style="text-align:center"><div class="ci">${r.i}</div><span class="cb" style="${bStyle(cls)}">${r.l} · ${r.s}</span></div><h2 class="ct">[ ${r.t} ]</h2><div class="cs">나의 방학 증후군 유형 테스트 결과</div><div class="cd">${r.d}</div><div class="cr">추천 휴식: ${r.r}</div>${bars}<div class="wf">Series 4 · Holiday Edition</div>`;document.body.appendChild(card);try{await new Promise(v=>setTimeout(v,200));const cv=await html2canvas(card,{scale:2,backgroundColor:"#8ad8ff",useCORS:true,logging:false,width:620,windowWidth:620});const blob=await new Promise(v=>cv.toBlob(v,"image/png"));if(!blob)throw new Error("blob-fail");const name=`나의_방학계획_${r.l}.png`;if(navigator.share&&navigator.canShare){const file=new File([blob],name,{type:"image/png"}),data={files:[file],title:"나의 방학 증후군 유형 테스트 결과"};try{if(navigator.canShare(data))await navigator.share(data);else throw new Error("fallback")}catch(e){download(blob,name)}}else download(blob,name);btn.textContent="저장 완료! ✅";setTimeout(()=>btn.textContent="내 방학 계획 저장하기",1800)}catch(e){console.error(e);alert("이미지 저장에 실패했습니다. 다시 시도하거나 스크린샷을 사용해주세요.");btn.textContent="내 방학 계획 저장하기"}finally{btn.classList.remove("saving");card.remove()}}
+function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u)}
+</script>
+</body>
+</html>

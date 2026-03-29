@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛡️ 나의 교실 속 빌런 대응 레벨</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #1a1a2e;
+  --bg-card: #16213e;
+  --glass-bg: rgba(22,33,62,0.65);
+  --glass-border: rgba(0,245,212,0.2);
+  --glass-glow: rgba(0,245,212,0.08);
+  --mint: #00f5d4;
+  --orange: #ff9f1c;
+  --pink: #ff6b9d;
+  --text-white: #f0f0f0;
+  --text-dim: rgba(240,240,240,0.6);
+  --text-mid: rgba(240,240,240,0.8);
+  --radius: 22px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* ── Animated BG ── */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+body::before {
+  width: 500px; height: 500px;
+  background: var(--mint);
+  top: -10%; left: -10%;
+  animation: orbA 18s ease-in-out infinite;
+}
+
+body::after {
+  width: 450px; height: 450px;
+  background: var(--orange);
+  bottom: -10%; right: -10%;
+  animation: orbB 22s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform: translate(0,0); }
+  33% { transform: translate(15vw, 20vh); }
+  66% { transform: translate(5vw, 10vh); }
+}
+@keyframes orbB {
+  0%,100% { transform: translate(0,0); }
+  33% { transform: translate(-10vw, -15vh); }
+  66% { transform: translate(-20vw, -5vh); }
+}
+
+/* Grid dots pattern */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(0,245,212,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Sound Toggle ── */
+.sound-toggle {
+  position: fixed;
+  top: 18px; left: 18px;
+  z-index: 500;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(0,245,212,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 28px rgba(0,245,212,0.2);
+}
+
+.sound-toggle .icon-on,
+.sound-toggle .icon-off {
+  position: absolute;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute;
+  left: 56px; top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.75);
+  color: var(--mint);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+/* ── App ── */
+.app-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0,245,212,0.08);
+  padding: 40px 32px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── Start ── */
+.start-screen { text-align: center; }
+
+.start-screen .emoji-hero {
+  font-size: 72px;
+  margin-bottom: 14px;
+  display: inline-block;
+  animation: heroFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+
+.start-screen h1 {
+  font-family: 'Gaegu', cursive;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--mint);
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.start-screen .series-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: rgba(255,159,28,0.15);
+  border: 1px solid rgba(255,159,28,0.3);
+  color: var(--orange);
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.start-screen .sub {
+  font-size: 0.92rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 52px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--mint), #00c9a7);
+  color: var(--bg-deep);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 28px rgba(0,245,212,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.start-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+}
+
+.start-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 36px rgba(0,245,212,0.4);
+}
+
+/* ── Progress ── */
+.progress-wrap { width:100%; margin-bottom:22px; }
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-info .q-num {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--mint);
+}
+
+.progress-info .q-count {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.progress-bar-bg {
+  width: 100%; height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--mint), var(--orange));
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1);
+}
+
+/* ── Question ── */
+.question-section { animation: fadeSlide 0.45s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(36px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
+.question-text {
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  word-break: keep-all;
+}
+
+.question-text .q-emoji {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 1.3rem;
+}
+
+/* ── Answers ── */
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.answer-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 15px;
+  border: 1.5px solid rgba(0,245,212,0.12);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: all 0.22s ease;
+  text-align: left;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.84rem;
+  color: var(--text-mid);
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.answer-btn .num-badge {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mint), var(--orange));
+  color: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.answer-btn:hover {
+  background: rgba(0,245,212,0.08);
+  border-color: var(--mint);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(0,245,212,0.12);
+  color: var(--text-white);
+}
+
+.answer-btn:active { transform: scale(0.97); }
+
+.answer-btn.picked {
+  background: rgba(0,245,212,0.12);
+  border-color: var(--mint);
+  box-shadow: 0 0 20px rgba(0,245,212,0.15);
+  color: var(--mint);
+  pointer-events: none;
+}
+
+/* ── Result ── */
+.result-screen {
+  text-align: center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.8) translateY(28px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.res-emoji {
+  font-size: 84px;
+  display: inline-block;
+  margin-bottom: 12px;
+  animation: emojiDance 1.2s ease-in-out infinite;
+}
+
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.12) rotate(-6deg); }
+  75% { transform:scale(1.12) rotate(6deg); }
+}
+
+.res-tier-badge {
+  display: inline-block;
+  padding: 10px 36px;
+  border-radius: 50px;
+  font-family: 'Gaegu', cursive;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.tier-S { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #1a1a2e; }
+.tier-A { background: linear-gradient(135deg, var(--mint), #00c9a7); color: #1a1a2e; }
+.tier-B { background: linear-gradient(135deg, #74b9ff, #a29bfe); color: #fff; }
+.tier-C { background: linear-gradient(135deg, var(--orange), #fdcb6e); color: #1a1a2e; }
+.tier-D { background: linear-gradient(135deg, var(--pink), #e17055); color: #fff; }
+.tier-F { background: linear-gradient(135deg, #636e72, #2d3436); color: #dfe6e9; }
+
+.res-title {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--mint);
+  margin-bottom: 6px;
+}
+
+.res-score-label {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.res-desc {
+  font-size: 0.92rem;
+  color: var(--text-mid);
+  line-height: 1.85;
+  margin-bottom: 18px;
+  word-break: keep-all;
+  padding: 0 6px;
+}
+
+.res-item-box {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 16px;
+  background: rgba(255,159,28,0.1);
+  border: 1px solid rgba(255,159,28,0.25);
+  margin-bottom: 28px;
+}
+
+.res-item-box .item-label {
+  font-size: 0.72rem;
+  color: var(--orange);
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.res-item-box .item-name {
+  font-size: 0.95rem;
+  color: var(--text-white);
+  font-weight: 700;
+}
+
+/* Score Bars */
+.score-section {
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.score-section h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.score-meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.meter-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  min-width: 28px;
+  text-align: right;
+}
+
+.meter-track {
+  flex: 1;
+  height: 18px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1.2s cubic-bezier(.23,1,.32,1);
+  width: 0;
+  background: linear-gradient(90deg, var(--mint), var(--orange));
+}
+
+.meter-pts {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  min-width: 36px;
+}
+
+/* ── Action Buttons ── */
+.result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 36px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--orange), #e17055);
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 22px rgba(255,159,28,0.3);
+}
+
+.save-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(255,159,28,0.45);
+}
+
+.save-btn.saving { pointer-events:none; opacity:0.7; }
+
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 36px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--mint), #00c9a7);
+  color: var(--bg-deep);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 22px rgba(0,245,212,0.3);
+}
+
+.retry-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0,245,212,0.4);
+}
+
+/* ── Capture Card ── */
+.capture-card {
+  position: fixed;
+  left: -9999px; top: 0;
+  width: 600px;
+  padding: 48px 40px 40px;
+  border-radius: 28px;
+  font-family: 'Noto Sans KR', sans-serif;
+  text-align: center;
+  z-index: -1;
+}
+
+.capture-card .cap-watermark {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  margin-top: 18px;
+  letter-spacing: 1px;
+}
+
+.capture-card .cap-emoji { font-size: 68px; margin-bottom: 10px; }
+
+.capture-card .cap-tier {
+  display: inline-block;
+  padding: 8px 30px;
+  border-radius: 50px;
+  font-family: 'Gaegu', cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.capture-card .cap-title {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mint);
+  margin-bottom: 6px;
+}
+
+.capture-card .cap-score-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 14px;
+}
+
+.capture-card .cap-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.8;
+  word-break: keep-all;
+  margin-bottom: 16px;
+  padding: 0 10px;
+}
+
+.capture-card .cap-item {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 14px;
+  background: rgba(255,159,28,0.18);
+  border: 1px solid rgba(255,159,28,0.3);
+}
+
+.capture-card .cap-item-label {
+  font-size: 0.68rem;
+  color: var(--orange);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.capture-card .cap-item-name {
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.capture-card .cap-meter {
+  margin-top: 18px;
+  text-align: left;
+}
+
+.capture-card .cap-meter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.capture-card .cap-meter-track {
+  flex: 1;
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.capture-card .cap-meter-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--mint), var(--orange));
+}
+
+.capture-card .cap-m-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  min-width: 48px;
+  text-align: right;
+}
+
+.capture-card .cap-m-pts {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  min-width: 30px;
+}
+
+/* ── Confetti ── */
+.confetti-box {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.confetti-dot {
+  position: absolute;
+  top: -20px;
+  border-radius: 3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Deco ── */
+.deco {
+  position: fixed;
+  font-size: 28px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+  animation: decoD 14s ease-in-out infinite;
+}
+
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-18px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+/* ── Responsive ── */
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:28px 18px; }
+  .start-screen h1 { font-size:1.7rem; }
+  .start-screen .emoji-hero { font-size:56px; }
+  .question-text { font-size:0.96rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.88rem; padding:13px 14px; }
+  .res-emoji { font-size:64px; }
+  .res-tier-badge { font-size:1.35rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- Sound Toggle -->
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<!-- Decorations -->
+<div class="deco" style="top:6%;left:5%;animation-delay:0s;">🛡️</div>
+<div class="deco" style="top:22%;right:7%;animation-delay:2s;">💥</div>
+<div class="deco" style="top:50%;left:3%;animation-delay:4s;">🧘</div>
+<div class="deco" style="top:72%;right:5%;animation-delay:6s;">🔥</div>
+<div class="deco" style="top:40%;left:91%;animation-delay:8s;">⚡</div>
+<div class="deco" style="top:88%;left:12%;animation-delay:3s;">😤</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">🛡️</div>
+      <h1>나의 교실 속<br>빌런 대응 레벨</h1>
+      <div class="series-tag">시리즈 2탄 · 멘탈 티어 테스트</div>
+      <p class="sub">교실에서 벌어지는 12가지 빌런 상황!<br>당신의 대처법으로 멘탈 티어를 측정합니다.<br>⚡ S티어부터 F티어까지, 당신은 어디? ⚡</p>
+      <button class="start-btn" onclick="beginQuiz()">측정 시작하기 🔬</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q1</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   🔊  Web Audio API – Sound Engine
+   ═══════════════════════════════════════ */
+let audioCtx = null;
+let soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) {
+    tog.classList.remove('muted');
+    tip.textContent = '효과음 ON';
+    playSelectSound();
+  } else {
+    tog.classList.add('muted');
+    tip.textContent = '효과음 OFF';
+  }
+}
+
+function playSelectSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.07);
+    osc.frequency.exponentialRampToValueAtTime(980, now + 0.14);
+    g.gain.setValueAtTime(0.16, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.2);
+
+    const o2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(1600, now + 0.02);
+    o2.frequency.exponentialRampToValueAtTime(2400, now + 0.1);
+    g2.gain.setValueAtTime(0.06, now + 0.02);
+    g2.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(now + 0.02); o2.stop(now + 0.16);
+  } catch(e) {}
+}
+
+function playResultSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const notes = [
+      {f:440, s:0, d:0.14},
+      {f:554, s:0.11, d:0.14},
+      {f:659, s:0.22, d:0.14},
+      {f:880, s:0.35, d:0.35}
+    ];
+    notes.forEach(n => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(n.f, now+n.s);
+      g.gain.setValueAtTime(0, now+n.s);
+      g.gain.linearRampToValueAtTime(0.2, now+n.s+0.02);
+      g.gain.setValueAtTime(0.2, now+n.s+n.d*0.6);
+      g.gain.exponentialRampToValueAtTime(0.001, now+n.s+n.d+0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now+n.s); o.stop(now+n.s+n.d+0.15);
+      const o2 = ctx.createOscillator();
+      const g3 = ctx.createGain();
+      o2.type = 'sine';
+      o2.frequency.setValueAtTime(n.f*2, now+n.s);
+      g3.gain.setValueAtTime(0, now+n.s);
+      g3.gain.linearRampToValueAtTime(0.05, now+n.s+0.02);
+      g3.gain.exponentialRampToValueAtTime(0.001, now+n.s+n.d+0.1);
+      o2.connect(g3); g3.connect(ctx.destination);
+      o2.start(now+n.s); o2.stop(now+n.s+n.d+0.1);
+    });
+    const sw = ctx.createOscillator();
+    const sg = ctx.createGain();
+    sw.type = 'sine';
+    sw.frequency.setValueAtTime(1800, now+0.55);
+    sw.frequency.exponentialRampToValueAtTime(3600, now+0.75);
+    sw.frequency.exponentialRampToValueAtTime(2800, now+0.95);
+    sg.gain.setValueAtTime(0, now+0.55);
+    sg.gain.linearRampToValueAtTime(0.04, now+0.6);
+    sg.gain.exponentialRampToValueAtTime(0.001, now+1.0);
+    sw.connect(sg); sg.connect(ctx.destination);
+    sw.start(now+0.55); sw.stop(now+1.0);
+  } catch(e) {}
+}
+
+/* ═══════════════════════════════════════
+   📝  Quiz Data — 12 Questions
+   ═══════════════════════════════════════ */
+const QS = [
+  {
+    e:"😭", q:"수업 시작 5분 전, 한 아이가 갑자기 대성통곡을 시작합니다. 이유는 '지우개를 잃어버려서'. 당신의 반응은?",
+    a:[
+      '"새 지우개 여기 있지~" 서랍에서 여분을 꺼내며 미소',
+      '"울지 마~ 같이 찾아보자" 진정시키며 수색 개시',
+      '"자, 옆 친구한테 빌려쓰자" 실용적 해결',
+      '"일단 수업부터 하자... 쉬는 시간에 찾아볼게" 약간 당황',
+      '"아니 지우개 하나로... 하..." 속으로 한숨',
+      '"(벌써 에너지 방전) 오늘 하루가 벌써 두렵다"'
+    ]
+  },
+  {
+    e:"🥊", q:"체육 시간, 두 아이가 '쟤가 먼저 때렸어요!'라며 동시에 울면서 달려옵니다. 당신의 대응은?",
+    a:[
+      '"자, 둘 다 심호흡. 선생님이 판사가 되어 줄게" 침착하게 분리',
+      '"CCTV 확인하자" (없지만) 일단 증거 수집 모드',
+      '"양쪽 얘기 다 들어볼게. 10분만 기다려" 중립 유지',
+      '"아... 제발 좀... 하 일단 떨어져 앉아" 피곤한 중재',
+      '"왜 맨날! 맨날! 싸우는 거야!" 볼륨이 올라감',
+      '"(영혼 이탈) 나는 교사인가, 심판인가..."'
+    ]
+  },
+  {
+    e:"🗣️", q:"조용히 수업 중인데 한 아이가 갑자기 큰 소리로 방귀를 뀝니다. 교실이 폭소 바다가 됩니다.",
+    a:[
+      '"자연현상이지~ 자, 3초 웃고 다시 집중!" 유쾌하게 넘김',
+      '"건강한 증거야~" 한 마디로 정리하고 수업 속행',
+      '"ㅎㅎ... 자 이제 됐고, 34페이지 보자" 적당히 웃고 수습',
+      '"(나도 참아야 하는 웃음과의 전쟁)" 수업 분위기 회복 어려움',
+      '"수업 분위기 완전 깨졌네..." 짜증 반 체념 반',
+      '"이 수업은 이미 끝났다..." 멘탈 셧다운'
+    ]
+  },
+  {
+    e:"📱", q:"수업 중 한 아이의 가방에서 스마트폰 알람이 미친 듯이 울립니다. '엄마가 넣어줬어요!'라고 주장하는 상황.",
+    a:[
+      '"어머니께 연락드릴게~ 일단 선생님이 맡을게" 매뉴얼 대로',
+      '"아 그래~ 일단 끄자. 쉬는 시간에 얘기하자" 쿨하게 수습',
+      '"가방에 넣어두고 수업 끝나면 얘기해" 최소 개입',
+      '"하... 학부모한테 또 문자해야 하나" 내심 번거로움',
+      '"(알람 소리에 찢어지는 멘탈)" 눈이 살짝 떨림',
+      '"교권 따위... 이 나라 교육이..." 현타 도착'
+    ]
+  },
+  {
+    e:"🎨", q:"미술 시간, 한 아이가 옆 친구의 작품에 물감을 '실수로' 쏟았습니다. 피해 아이는 대성통곡 중.",
+    a:[
+      '"우연이 만든 예술이 될 수도 있어! 같이 살려보자" 전화위복',
+      '"괜찮아~ 선생님이 도와줄게. 더 멋지게 만들어보자"',
+      '"실수할 수 있어. 사과하고 도와줘" 양측 중재',
+      '"아... 또냐... 일단 닦자..." 피로감이 밀려옴',
+      '"왜 조심을 안 해! (목소리 상승)" 화가 치밈',
+      '"(물감이 내 마음에도 쏟아진 기분)" 의욕 상실'
+    ]
+  },
+  {
+    e:"🍽️", q:"급식 시간, 한 아이가 국을 들고 가다가 옆 친구 머리 위에 쏟습니다. 아수라장이 펼쳐집니다.",
+    a:[
+      '"괜찮아?! 데진 데 없어?!" 즉시 응급 대응 후 침착 수습',
+      '"보건실 먼저! 나머지는 자리에!" 빠른 지시',
+      '"일단 닦이고... 보건실 가고... 급식은..." 동시다발 처리',
+      '"(머릿속 백지) 일단 뛰어간다" 패닉 속 행동',
+      '"매일매일이 사건사고야 진짜..." 탄식 모드',
+      '"(이미 퇴사를 검색 중인 또 다른 나)" 그냥 멍'
+    ]
+  },
+  {
+    e:"🪑", q:"수업 중 한 아이가 의자를 뒤로 젖히고 놀다가 '쿵!' 하고 넘어집니다. 다행히 안 다쳤지만 수업이 중단됩니다.",
+    a:[
+      '"안 다쳐서 다행이다! 자, 이게 왜 위험한지 알겠지?" 교육 기회로 전환',
+      '"괜찮아? 일어나~ 의자 바로 앉고 수업하자" 담담',
+      '"...그러니까 젖히지 말랬잖아. 다행이다. 자 수업하자"',
+      '"(예상된 사고에 놀랍지도 않음) 하아..."',
+      '"맨날 말해도 안 듣지?! 그러니까 넘어지지!" 잔소리 폭발',
+      '"(소리 없는 비명) 수업이란 것이 가능한 건가"'
+    ]
+  },
+  {
+    e:"📝", q:"학부모로부터 '우리 아이만 차별하는 것 같다'는 장문의 항의 메시지가 옵니다.",
+    a:[
+      '"소중한 의견 감사합니다" 정중하게 상담 일정 잡기',
+      '"음... 오해가 있으셨군요" 차분하게 해명 메시지 작성',
+      '"일단 읽었고... 답변은 내일 하자" 감정 분리',
+      '"(손이 떨리며 메시지 세 번 읽기)" 스트레스 급상승',
+      '"내가 뭘 잘못했다고!! (주먹 불끈)" 분노',
+      '"(폰을 서랍에 넣고 현실 도피) 안 봤어... 안 봤어..."'
+    ]
+  },
+  {
+    e:"🤥", q:"한 아이가 '숙제를 했는데 강아지가 찢어 먹었어요'라며 클래식한 변명을 합니다.",
+    a:[
+      '"오~ 강아지도 공부 욕심이 있구나! 내일은 꼭 내자" 유머로 수용',
+      '"그렇구나~ 사진이라도 있으면 좋겠다" 위트 있게 대응',
+      '"알겠어, 내일까지 다시 해와" 담백한 처리',
+      '"솔직히 안 한 거지...? 하... 알겠다 내일까지" 체념',
+      '"변명 말고 그냥 솔직하게 말해!" 짜증 표출',
+      '"(이 직업 선택한 과거의 나에게 편지를 쓰고 싶다)"'
+    ]
+  },
+  {
+    e:"🔔", q:"하교 시간! 그런데 한 아이가 '선생님, 가방이 사라졌어요'라며 발을 동동 구릅니다.",
+    a:[
+      '"걱정 마~ 반드시 찾아줄게!" 교실 수색 작전 개시',
+      '"자, 오늘 어디어디 갔었어? 역추적하자" 탐정 모드',
+      '"일단 교무실에 연락하고... 보자" 절차적 대응',
+      '"(퇴근 시간이...) 아 네... 찾아봅시다" 내적 갈등',
+      '"왜 맨날 하교 시간에 이런 일이!!" 분노+피로',
+      '"(현관문 앞에서 우주를 바라보는 나)" 존재론적 고민 돌입'
+    ]
+  },
+  {
+    e:"🎪", q:"학예회 리허설 도중, 주연 아이가 '배 아파요'라며 갑자기 빠지겠다고 합니다. 공연은 내일입니다.",
+    a:[
+      '"괜찮아~ 일단 쉬어. 비상 플랜B 가동!" 즉시 대안 마련',
+      '"진짜 아픈 거야, 긴장한 거야? 같이 이야기해보자"',
+      '"보건실 갔다 와. 올 수 있으면 다시 와" 상황 지켜보기',
+      '"(내일 공연인데...) 제발... 제발..." 속으로 절규',
+      '"아니 이 타이밍에?! 연습을 몇 달을 했는데!!" 폭발 직전',
+      '"(모든 것이 무너지는 소리)" 정신적 블루스크린'
+    ]
+  },
+  {
+    e:"📊", q:"드디어 금요일 6교시! 끝이 보이는데, 갑자기 교감선생님이 '월요일까지 보고서 제출' 공문을 보냅니다.",
+    a:[
+      '"네~ 주말에 후딱 해야죠!" 긍정의 아이콘',
+      '"일단 확인했습니다. 주말에 처리하겠습니다" 프로 의식',
+      '"(주말 계획 수정...) 뭐 어쩔 수 없지" 수용',
+      '"(......) 이걸 금요일 6교시에 보내다니" 허탈',
+      '"주말도 없는 거야?! 대체 왜?!" 분노 게이지 MAX',
+      '"(조용히 사직서 양식을 검색한다)" 한계 돌파'
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════
+   🏆  Result Tiers
+   ═══════════════════════════════════════ */
+const TIERS = [
+  { min:65, tier:"S", emoji:"🧘", cls:"tier-S",
+    title:"해탈의 성자 – 달라이 라마급",
+    desc:'당신의 멘탈은 다이아몬드보다 단단합니다. 아이들의 빌런 짓을 "성장의 과정"으로 승화시키는 경지에 올랐군요. 학교가 아니라 사찰에 계셔야 할 분 아닌가요?',
+    item:"그저 명상 한 스푼 (이미 완성형이라 딱히 필요 없음)" },
+  { min:55, tier:"A", emoji:"⚔️", cls:"tier-A",
+    title:"강철의 연금술사 – 베테랑 조련사",
+    desc:'어떤 돌발 상황도 "오케이, 계획대로 되고 있어"라며 처리하는 프로페셔널! 유머와 카리스마를 적절히 섞어 교실을 장악하는 당신은 동료들의 워너비입니다.',
+    item:"고급 라벨기와 시원한 아이스 아메리카노" },
+  { min:45, tier:"B", emoji:"🕊️", cls:"tier-B",
+    title:"평화 유지군 – 중립의 수호자",
+    desc:'적당한 공감과 적당한 거리두기의 달인. 에너지를 효율적으로 배분할 줄 아는 똑똑한 선생님이시네요. 큰 사고만 아니면 허허 웃으며 넘길 줄 아는 여유가 매력입니다.',
+    item:"퇴근 후 넷플릭스와 맥주 한 캔" },
+  { min:35, tier:"C", emoji:"🍪", cls:"tier-C",
+    title:"쿠쿠다스 멘탈 – 위태로운 예술가",
+    desc:'마음이 너무 여리고 착해서 상처받기 쉬운 타입! 하지만 그만큼 섬세하게 아이들을 챙겨주기도 하죠. 오늘 퇴근길엔 맛있는 거 꼭 챙겨 드세요.',
+    item:"폭신한 등쿠션과 달콤한 마카롱 세트" },
+  { min:25, tier:"D", emoji:"🚂", cls:"tier-D",
+    title:"폭주 기관차 – 분노 임계점 도달",
+    desc:'참을 만큼 참았다! 아이들이 선을 넘을 때마다 심장 박동수가 급격히 올라가는 타입. "나 때는 안 그랬는데"가 머릿속을 맴돌지만, 오늘도 인내하는 당신은 이 시대의 참스승입니다.',
+    item:"노이즈 캔슬링 헤드셋과 매운 떡볶이" },
+  { min:0, tier:"F", emoji:"👻", cls:"tier-F",
+    title:"영혼 가출 – 전생에 죄인",
+    desc:'매일 아침 출근이 도살장 끌려가는 기분인가요? 아이들의 숨소리조차 스트레스로 다가오는 번아웃 위기! 당신의 잘못이 아니에요. 지금 당장 쉬어야 합니다.',
+    item:"연차 신청서와 제주도행 편도 티켓" }
+];
+
+function getTier(score) {
+  for (const t of TIERS) {
+    if (score >= t.min) return t;
+  }
+  return TIERS[TIERS.length-1];
+}
+
+/* ═══════════════════════════════════════
+   🎮  Quiz Logic
+   ═══════════════════════════════════════ */
+let cur = 0, totalScore = 0;
+let lastResultData = null;
+// 선택지 점수: (1)=6점, (2)=5점, ..., (6)=1점
+const PTS = [6, 5, 4, 3, 2, 1];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  totalScore = 0;
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${cur+1}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation = 'none';
+  sec.offsetHeight;
+  sec.style.animation = 'fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${i+1}</span><span>${t}</span>`;
+    b.onclick = () => pick(i, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(idx, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('picked'));
+  btn.classList.add('picked');
+  totalScore += PTS[idx];
+  playSelectSound();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  const t = getTier(totalScore);
+  lastResultData = { t, totalScore };
+
+  spawnConfetti();
+  playResultSound();
+
+  // Score meter
+  const pct = (totalScore / 72) * 100;
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${t.emoji}</div>
+    <div class="res-tier-badge ${t.cls}">${t.tier} 티어</div>
+    <div class="res-title">[ ${t.title} ]</div>
+    <div class="res-score-label">총점: ${totalScore} / 72점</div>
+    <div class="res-desc">${t.desc}</div>
+    <div class="res-item-box">
+      <div class="item-label">🎁 추천 아이템</div>
+      <div class="item-name">${t.item}</div>
+    </div>
+    <div class="score-section">
+      <h3>⚡ 멘탈 게이지</h3>
+      <div class="score-meter">
+        <span class="meter-label">0</span>
+        <div class="meter-track">
+          <div class="meter-fill" id="meterFill" data-w="${pct}"></div>
+        </div>
+        <span class="meter-pts">${totalScore}점</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0 36px;margin-top:2px;">
+        <span style="font-size:0.65rem;color:var(--text-dim);">F</span>
+        <span style="font-size:0.65rem;color:var(--text-dim);">D</span>
+        <span style="font-size:0.65rem;color:var(--text-dim);">C</span>
+        <span style="font-size:0.65rem;color:var(--text-dim);">B</span>
+        <span style="font-size:0.65rem;color:var(--text-dim);">A</span>
+        <span style="font-size:0.65rem;color:var(--text-dim);">S</span>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="save-btn" id="saveBtn" onclick="saveResult()">내 결과 저장하기 📸</button>
+      <button class="retry-btn" onclick="goHome()">다시 측정하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const m = document.getElementById('meterFill');
+    if (m) m.style.width = m.dataset.w + '%';
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if (c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if (old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#00f5d4','#ff9f1c','#ff6b9d','#ffd700','#74b9ff','#a29bfe','#55efc4','#fdcb6e','#00c9a7','#e17055'];
+  for (let i = 0; i < 90; i++) {
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*9+5)+'px';
+    d.style.height = (Math.random()*9+5)+'px';
+    d.style.animationDuration = (Math.random()*2.5+2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6000);
+}
+
+/* ═══════════════════════════════════════
+   📸  Save Result as Image
+   ═══════════════════════════════════════ */
+const tierBgMap = {
+  'tier-S': 'linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #1a1a2e 100%)',
+  'tier-A': 'linear-gradient(135deg, #1a1a2e 0%, #0d3b36 50%, #1a1a2e 100%)',
+  'tier-B': 'linear-gradient(135deg, #1a1a2e 0%, #1b2d4e 50%, #1a1a2e 100%)',
+  'tier-C': 'linear-gradient(135deg, #1a1a2e 0%, #3b2d0d 50%, #1a1a2e 100%)',
+  'tier-D': 'linear-gradient(135deg, #1a1a2e 0%, #3b1520 50%, #1a1a2e 100%)',
+  'tier-F': 'linear-gradient(135deg, #1a1a2e 0%, #2d2d2d 50%, #1a1a2e 100%)',
+};
+
+const tierBadgeBg = {
+  'tier-S': 'linear-gradient(135deg, #ffd700, #ffaa00)',
+  'tier-A': 'linear-gradient(135deg, #00f5d4, #00c9a7)',
+  'tier-B': 'linear-gradient(135deg, #74b9ff, #a29bfe)',
+  'tier-C': 'linear-gradient(135deg, #ff9f1c, #fdcb6e)',
+  'tier-D': 'linear-gradient(135deg, #ff6b9d, #e17055)',
+  'tier-F': 'linear-gradient(135deg, #636e72, #2d3436)',
+};
+
+const tierBadgeColor = {
+  'tier-S': '#1a1a2e', 'tier-A': '#1a1a2e', 'tier-B': '#fff',
+  'tier-C': '#1a1a2e', 'tier-D': '#fff', 'tier-F': '#dfe6e9',
+};
+
+async function saveResult() {
+  if (!lastResultData) return;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중... ⏳';
+
+  const { t, totalScore: ts } = lastResultData;
+  const pct = (ts / 72) * 100;
+
+  const card = document.createElement('div');
+  card.className = 'capture-card';
+  card.style.background = tierBgMap[t.cls];
+
+  card.innerHTML = `
+    <div class="cap-emoji">${t.emoji}</div>
+    <div class="cap-tier" style="background:${tierBadgeBg[t.cls]};color:${tierBadgeColor[t.cls]}">${t.tier} 티어</div>
+    <div class="cap-title">[ ${t.title} ]</div>
+    <div class="cap-score-label">총점: ${ts} / 72점</div>
+    <div class="cap-desc">${t.desc}</div>
+    <div class="cap-item">
+      <div class="cap-item-label">🎁 추천 아이템</div>
+      <div class="cap-item-name">${t.item}</div>
+    </div>
+    <div class="cap-meter">
+      <div class="cap-meter-row">
+        <span class="cap-m-label">멘탈</span>
+        <div class="cap-meter-track">
+          <div class="cap-meter-fill" style="width:${pct}%"></div>
+        </div>
+        <span class="cap-m-pts">${ts}점</span>
+      </div>
+    </div>
+    <div class="cap-watermark">🛡️ 나의 교실 속 빌런 대응 레벨 · 시리즈 2탄</div>
+  `;
+
+  document.body.appendChild(card);
+
+  try {
+    await new Promise(res => setTimeout(res, 300));
+    const canvas = await html2canvas(card, {
+      scale: 2, backgroundColor: '#1a1a2e',
+      useCORS: true, logging: false,
+      width: 600, windowWidth: 600
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `멘탈티어_${t.tier}티어.png`, { type:'image/png' });
+        const shareData = { files:[file], title:'나의 교실 속 빌런 대응 레벨', text:`나의 멘탈 티어는 ${t.tier}티어! - ${t.title}` };
+        try {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            card.remove();
+            btn.classList.remove('saving');
+            btn.textContent = '내 결과 저장하기 📸';
+            return;
+          }
+        } catch(e) {}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `멘탈티어_${t.tier}티어.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      card.remove();
+      btn.classList.remove('saving');
+      btn.innerHTML = '저장 완료! ✅';
+      setTimeout(() => { btn.textContent = '내 결과 저장하기 📸'; }, 2000);
+    }, 'image/png');
+
+  } catch(e) {
+    console.error('Capture failed:', e);
+    card.remove();
+    btn.classList.remove('saving');
+    btn.textContent = '내 결과 저장하기 📸';
+    alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+  }
+}
+</script>
+</body>
+</html>

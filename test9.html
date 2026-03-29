@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💻 나의 에듀테크 숙련도 레벨 테스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0a0e27;
+  --bg-mid: #0f1535;
+  --bg-card: rgba(15,21,53,0.65);
+  --glass-border: rgba(76,175,255,0.15);
+  --glass-glow: rgba(76,175,255,0.05);
+  --cyan: #4cb7ff;
+  --lime: #b3ff4c;
+  --pink: #ff6b9d;
+  --gold: #ffd166;
+  --purple: #d946ef;
+  --red: #ff4757;
+  --text-white: #f5f8ff;
+  --text-dim: rgba(245,248,255,0.45);
+  --text-mid: rgba(245,248,255,0.75);
+  --radius: 20px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* ── Ambient BG ── */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 600px; height: 600px;
+  background: var(--cyan);
+  opacity: 0.12;
+  top: -10%; right: -5%;
+  animation: orbA 22s ease-in-out infinite;
+}
+
+body::after {
+  width: 550px; height: 550px;
+  background: var(--lime);
+  opacity: 0.08;
+  bottom: -8%; left: -8%;
+  animation: orbB 26s ease-in-out infinite;
+}
+
+@keyframes orbA {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(-14vw, 20vh); }
+  66% { transform:translate(-8vw, 10vh); }
+}
+
+@keyframes orbB {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(16vw, -14vh); }
+  66% { transform:translate(10vw, -6vh); }
+}
+
+/* Tech Grid BG */
+.grid-bg {
+  position: fixed; inset:0; z-index:0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(76,181,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(76,181,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* ── Sound Toggle ── */
+.sound-toggle {
+  position: fixed; top:18px; left:18px; z-index:500;
+  width:48px; height:48px; border-radius:50%;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 24px rgba(76,175,255,0.1);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 32px rgba(179,255,76,0.2);
+}
+
+.sound-toggle .icon-on,
+.sound-toggle .icon-off {
+  position: absolute;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.sound-toggle.muted .icon-on { opacity:0; transform:scale(0.6); }
+.sound-toggle.muted .icon-off { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-on { opacity:1; transform:scale(1); }
+.sound-toggle:not(.muted) .icon-off { opacity:0; transform:scale(0.6); }
+
+.sound-tooltip {
+  position: absolute; left:56px; top:50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.8);
+  color: var(--lime);
+  font-size: 0.72rem; font-weight:600;
+  padding: 6px 12px; border-radius:8px;
+  white-space: nowrap;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.2s;
+}
+
+.sound-toggle:hover .sound-tooltip { opacity:1; }
+
+/* ── App ── */
+.app-container {
+  position: relative; z-index:1;
+  width: 100%; max-width: 720px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 40px;
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(76,175,255,0.08);
+  padding: 44px 36px;
+  width: 100%;
+  animation: cardIn 0.6s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(32px) scale(0.96); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── Start ── */
+.start-screen { text-align:center; }
+
+.start-screen .emoji-hero {
+  font-size:76px; margin-bottom:16px;
+  display:inline-block;
+  animation: heroFloat 2.8s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-16px) rotate(-2deg); }
+}
+
+.start-screen h1 {
+  font-family:'Gaegu',cursive;
+  font-size:2.4rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.35; margin-bottom:8px;
+  letter-spacing: -0.5px;
+}
+
+.start-screen h1 span {
+  background: linear-gradient(135deg, var(--cyan), var(--lime));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.series-tag {
+  display:inline-block;
+  padding:6px 18px; border-radius:24px;
+  background: rgba(76,175,255,0.12);
+  border:1px solid rgba(179,255,76,0.25);
+  color: var(--lime);
+  font-size:0.76rem; font-weight:700;
+  margin-bottom:18px; letter-spacing:0.8px;
+}
+
+.start-screen .sub {
+  font-size:0.95rem;
+  color: var(--text-mid);
+  line-height:1.8; margin-bottom:36px;
+}
+
+.start-btn {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:17px 56px; border:none; border-radius:52px;
+  background: linear-gradient(135deg, var(--cyan), var(--lime));
+  color: var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.18rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow: 0 8px 32px rgba(76,175,255,0.3);
+  position:relative; overflow:hidden;
+}
+
+.start-btn::after {
+  content:''; position:absolute;
+  top:-50%; left:-50%; width:200%; height:200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform:translateX(-100%) rotate(25deg); }
+  100% { transform:translateX(100%) rotate(25deg); }
+}
+
+.start-btn:hover {
+  transform:translateY(-4px) scale(1.04);
+  box-shadow:0 14px 40px rgba(76,175,255,0.4);
+}
+
+/* ── Progress ── */
+.progress-wrap { width:100%; margin-bottom:24px; }
+
+.progress-info {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:12px;
+}
+
+.progress-info .q-num {
+  font-family:'Fira Code',monospace;
+  font-size:1.3rem; font-weight:700;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+.progress-info .q-count {
+  font-size:0.82rem; color:var(--text-dim); font-weight:600;
+  font-family:'Fira Code',monospace;
+}
+
+.progress-bar-bg {
+  width:100%; height:11px;
+  background: rgba(255,255,255,0.05);
+  border-radius:12px; overflow:hidden;
+  border: 1px solid rgba(76,175,255,0.1);
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--cyan), var(--lime));
+  border-radius:12px;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1);
+  box-shadow: 0 0 16px rgba(179,255,76,0.4);
+}
+
+/* ── Question ── */
+.question-section { animation: fadeSlide 0.45s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateX(40px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
+.question-text {
+  font-size:1.1rem; font-weight:700;
+  color: var(--text-white);
+  line-height:1.75; margin-bottom:28px;
+  word-break:keep-all;
+}
+
+.question-text .q-emoji {
+  display:inline-block; margin-right:8px; font-size:1.35rem;
+}
+
+/* ── Answers ── */
+.answers-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+
+.answer-btn {
+  display:flex; align-items:flex-start; gap:11px;
+  padding:15px 16px;
+  border:1.5px solid rgba(76,175,255,0.08);
+  border-radius:16px;
+  background:rgba(255,255,255,0.02);
+  cursor:pointer; transition:all 0.22s ease;
+  text-align:left;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.86rem; color:var(--text-mid);
+  line-height:1.6; word-break:keep-all;
+}
+
+.answer-btn .num-badge {
+  flex-shrink:0; width:28px; height:28px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--cyan), var(--lime));
+  color:var(--bg-deep);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.72rem; font-weight:700;
+  margin-top:2px;
+  font-family:'Fira Code',monospace;
+}
+
+.answer-btn:hover {
+  background:rgba(76,175,255,0.1);
+  border-color:var(--cyan);
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(76,175,255,0.15);
+  color:var(--text-white);
+}
+
+.answer-btn:active { transform:scale(0.98); }
+
+.answer-btn.picked {
+  background:rgba(179,255,76,0.12);
+  border-color:var(--lime);
+  box-shadow:0 0 20px rgba(179,255,76,0.2);
+  color:var(--lime);
+  pointer-events:none;
+}
+
+/* ── Result ── */
+.result-screen {
+  text-align:center;
+  animation: popIn 0.65s cubic-bezier(.23,1,.32,1) both;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.82) translateY(30px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.res-emoji {
+  font-size:88px; display:inline-block; margin-bottom:14px;
+  animation: emojiDance 1.3s ease-in-out infinite;
+}
+
+@keyframes emojiDance {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  25% { transform:scale(1.14) rotate(-8deg); }
+  75% { transform:scale(1.14) rotate(8deg); }
+}
+
+.res-type-badge {
+  display:inline-block;
+  padding:12px 40px; border-radius:52px;
+  font-family:'Gaegu',cursive;
+  font-size:1.7rem; font-weight:700;
+  margin-bottom:10px;
+}
+
+.type-A { background:linear-gradient(135deg, var(--cyan), #0095ff); color:#fff; }
+.type-B { background:linear-gradient(135deg, var(--lime), #9dff00); color:var(--bg-deep); }
+.type-C { background:linear-gradient(135deg, var(--gold), #ffb700); color:var(--bg-deep); }
+.type-D { background:linear-gradient(135deg, var(--pink), #ff4d6d); color:#fff; }
+.type-E { background:linear-gradient(135deg, var(--purple), #d946ef); color:#fff; }
+.type-F { background:linear-gradient(135deg, var(--red), #ff6b6b); color:#fff; }
+
+.res-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.35rem; font-weight:700;
+  color:var(--cyan); margin-bottom:10px;
+}
+
+.res-desc {
+  font-size:0.95rem; color:var(--text-mid);
+  line-height:1.9; margin-bottom:22px;
+  word-break:keep-all; padding:0 8px;
+}
+
+.res-info-row {
+  display:flex; gap:14px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:32px;
+}
+
+.res-info-box {
+  flex:1; min-width:200px; max-width:300px;
+  padding:16px 20px; border-radius:16px;
+  text-align:left;
+}
+
+.res-info-box.work-box {
+  background:rgba(76,175,255,0.1);
+  border:1px solid rgba(76,175,255,0.25);
+}
+
+.res-info-box.item-box {
+  background:rgba(179,255,76,0.1);
+  border:1px solid rgba(179,255,76,0.25);
+}
+
+.info-label {
+  font-size:0.72rem; font-weight:700;
+  letter-spacing:0.6px; margin-bottom:6px;
+  font-family:'Fira Code',monospace;
+}
+
+.work-box .info-label { color:var(--cyan); }
+.item-box .info-label { color:var(--lime); }
+
+.info-value {
+  font-size:0.91rem; font-weight:700;
+  color:var(--text-white); line-height:1.6;
+}
+
+/* Score Bars */
+.score-section {
+  margin-bottom:32px; text-align:left;
+}
+
+.score-section h3 {
+  font-size:0.88rem; font-weight:700;
+  color:var(--text-mid); margin-bottom:16px;
+  text-align:center;
+  font-family:'Fira Code',monospace;
+  letter-spacing: 1px;
+}
+
+.bar-row {
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+
+.bar-label {
+  font-size:0.76rem; font-weight:700;
+  color:var(--text-dim); min-width:70px; text-align:right;
+  font-family:'Fira Code',monospace;
+}
+
+.bar-track {
+  flex:1; height:18px;
+  background:rgba(255,255,255,0.04);
+  border-radius:10px; overflow:hidden;
+  border: 0.5px solid rgba(76,175,255,0.1);
+}
+
+.bar-fill {
+  height:100%; border-radius:10px;
+  transition: width 1.2s cubic-bezier(.23,1,.32,1);
+  width:0;
+}
+
+.bf-A { background:linear-gradient(90deg, var(--cyan), #0095ff); }
+.bf-B { background:linear-gradient(90deg, var(--lime), #9dff00); }
+.bf-C { background:linear-gradient(90deg, var(--gold), #ffb700); }
+.bf-D { background:linear-gradient(90deg, var(--pink), #ff4d6d); }
+.bf-E { background:linear-gradient(90deg, var(--purple), #d946ef); }
+.bf-F { background:linear-gradient(90deg, var(--red), #ff6b6b); }
+
+.bar-pts {
+  font-size:0.8rem; font-weight:700;
+  color:var(--text-dim); min-width:32px;
+  font-family:'Fira Code',monospace;
+}
+
+/* ── Action Buttons ── */
+.result-actions {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+
+.save-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 40px; border:none; border-radius:52px;
+  background:linear-gradient(135deg, var(--purple), #d946ef);
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.05rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 8px 28px rgba(217,70,239,0.35);
+}
+
+.save-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 12px 36px rgba(217,70,239,0.45);
+}
+
+.save-btn.saving { pointer-events:none; opacity:0.7; }
+
+.retry-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:16px 40px; border:none; border-radius:52px;
+  background:linear-gradient(135deg, var(--cyan), var(--lime));
+  color:var(--bg-deep);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:1.05rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s;
+  box-shadow:0 8px 28px rgba(76,175,255,0.3);
+}
+
+.retry-btn:hover {
+  transform:translateY(-3px);
+  box-shadow:0 12px 36px rgba(76,175,255,0.4);
+}
+
+/* ── Capture Card ── */
+.capture-card {
+  position:fixed; left:-9999px; top:0;
+  width:640px; padding:52px 44px 44px;
+  border-radius:28px;
+  font-family:'Noto Sans KR',sans-serif;
+  text-align:center; z-index:-1;
+}
+
+.capture-card .cap-wm {
+  font-size:0.68rem; color:rgba(245,248,255,0.35);
+  margin-top:20px; letter-spacing:1.2px;
+  font-family:'Fira Code',monospace;
+}
+
+.capture-card .cap-emoji { font-size:72px; margin-bottom:12px; }
+
+.capture-card .cap-badge {
+  display:inline-block; padding:10px 36px; border-radius:52px;
+  font-family:'Gaegu',cursive;
+  font-size:1.6rem; font-weight:700;
+  margin-bottom:12px;
+}
+
+.capture-card .cap-title {
+  font-family:'Gaegu',cursive;
+  font-size:1.25rem; font-weight:700;
+  color:var(--cyan); margin-bottom:12px;
+}
+
+.capture-card .cap-desc {
+  font-size:0.87rem; color:rgba(245,248,255,0.75);
+  line-height:1.85; word-break:keep-all;
+  margin-bottom:18px; padding:0 12px;
+}
+
+.capture-card .cap-info-row {
+  display:flex; gap:12px; justify-content:center;
+  flex-wrap:wrap; margin-bottom:10px;
+}
+
+.capture-card .cap-info-box {
+  flex:1; min-width:180px; max-width:280px;
+  padding:12px 16px; border-radius:14px;
+  text-align:left;
+}
+
+.capture-card .cap-work {
+  background:rgba(76,175,255,0.14);
+  border:1px solid rgba(76,175,255,0.3);
+}
+
+.capture-card .cap-item {
+  background:rgba(179,255,76,0.14);
+  border:1px solid rgba(179,255,76,0.3);
+}
+
+.capture-card .cap-il {
+  font-size:0.66rem; font-weight:700;
+  margin-bottom:3px; letter-spacing:0.6px;
+  font-family:'Fira Code',monospace;
+}
+
+.capture-card .cap-work .cap-il { color:var(--cyan); }
+.capture-card .cap-item .cap-il { color:var(--lime); }
+
+.capture-card .cap-iv {
+  font-size:0.85rem; font-weight:700;
+  color:#fff; line-height:1.6;
+}
+
+.capture-card .cap-bars { text-align:left; margin-top:18px; }
+
+.capture-card .cap-br {
+  display:flex; align-items:center; gap:8px; margin-bottom:6px;
+}
+
+.capture-card .cap-bl {
+  font-size:0.7rem; font-weight:700;
+  color:rgba(245,248,255,0.45); min-width:62px; text-align:right;
+  font-family:'Fira Code',monospace;
+}
+
+.capture-card .cap-bt {
+  flex:1; height:14px;
+  background:rgba(255,255,255,0.08);
+  border-radius:8px; overflow:hidden;
+}
+
+.capture-card .cap-bf {
+  height:100%; border-radius:8px;
+  background:linear-gradient(90deg, var(--cyan), var(--lime));
+}
+
+.capture-card .cap-bp {
+  font-size:0.7rem; font-weight:700;
+  color:rgba(245,248,255,0.45); min-width:28px;
+  font-family:'Fira Code',monospace;
+}
+
+/* ── Confetti ── */
+.confetti-box {
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none; z-index:999; overflow:hidden;
+}
+
+.confetti-dot {
+  position:absolute; top:-20px; border-radius:3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Deco ── */
+.deco {
+  position:fixed; font-size:28px; opacity:0.05;
+  pointer-events:none; z-index:0;
+  font-family:'Fira Code',monospace;
+  animation: decoD 15s ease-in-out infinite;
+}
+
+@keyframes decoD {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  50% { transform:translateY(-18px) rotate(8deg); }
+}
+
+.screen { display:none; }
+.screen.on { display:block; }
+
+/* ── Responsive ── */
+@media (max-width:640px) {
+  body { padding:12px; }
+  .glass-card { padding:32px 20px; }
+  .start-screen h1 { font-size:1.8rem; }
+  .start-screen .emoji-hero { font-size:62px; }
+  .question-text { font-size:1rem; }
+  .answers-grid { grid-template-columns:1fr; gap:10px; }
+  .answer-btn { font-size:0.9rem; padding:14px 15px; }
+  .res-emoji { font-size:68px; }
+  .res-type-badge { font-size:1.4rem; }
+  .sound-toggle { width:42px; height:42px; font-size:19px; top:12px; left:12px; }
+  .sound-tooltip { display:none; }
+  .result-actions { flex-direction:column; align-items:center; }
+  .res-info-row { flex-direction:column; align-items:center; }
+  .res-info-box { max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+  <span class="icon-on">🔊</span>
+  <span class="icon-off">🔇</span>
+  <span class="sound-tooltip" id="soundTip">효과음 ON</span>
+</div>
+
+<div class="deco" style="top:8%;left:4%;animation-delay:0s;">{'{'}</div>
+<div class="deco" style="top:22%;right:6%;animation-delay:2s;">{'}'}</div>
+<div class="deco" style="top:52%;left:3%;animation-delay:4s;">{'['}</div>
+<div class="deco" style="top:75%;right:5%;animation-delay:6s;">{'<'}</div>
+<div class="deco" style="top:40%;left:94%;animation-delay:8s;">{'>'}</div>
+<div class="deco" style="top:88%;left:8%;animation-delay:3s;">{'='}</div>
+
+<div class="app-container">
+
+  <!-- START -->
+  <div class="glass-card screen on" id="screenStart">
+    <div class="start-screen">
+      <div class="emoji-hero">💻</div>
+      <h1>나의 에듀테크<br><span>숙련도 레벨 테스트</span></h1>
+      <div class="series-tag">시리즈 9탄 · 기술 친화도 진단</div>
+      <p class="sub">당신은 Ctrl+Alt+Del인가, 마우스만 아는가?<br>12가지 기술 상황에서 드러나는 당신의 진정한 모습!<br>💻 AI 마법사부터 해탈의 무소유자까지, 6가지 유형 분석 💻</p>
+      <button class="start-btn" onclick="beginQuiz()">진단 시작하기 🚀</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="glass-card screen" id="screenQuiz">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="q-num" id="elQNum">Q01</span>
+        <span class="q-count" id="elQCount">1 / 12</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="elProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-section" id="elQSection">
+      <div class="question-text" id="elQText"></div>
+      <div class="answers-grid" id="elAnswers"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="glass-card screen" id="screenResult">
+    <div class="result-screen" id="elResult"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   🔊  Sound Engine
+   ═══════════════════════════════════════ */
+let audioCtx = null, soundOn = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const tog = document.getElementById('soundToggle');
+  const tip = document.getElementById('soundTip');
+  if (soundOn) { tog.classList.remove('muted'); tip.textContent='효과음 ON'; playSelectSound(); }
+  else { tog.classList.add('muted'); tip.textContent='효과음 OFF'; }
+}
+
+/* Tech Click Sound */
+function playSelectSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const o1 = ctx.createOscillator(), g1 = ctx.createGain();
+    o1.type='square';
+    o1.frequency.setValueAtTime(950, now);
+    o1.frequency.exponentialRampToValueAtTime(1600, now+0.05);
+    g1.gain.setValueAtTime(0.1, now);
+    g1.gain.exponentialRampToValueAtTime(0.001, now+0.12);
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.start(now); o1.stop(now+0.12);
+    
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.type='sine';
+    o2.frequency.setValueAtTime(2200, now+0.02);
+    o2.frequency.exponentialRampToValueAtTime(3200, now+0.08);
+    g2.gain.setValueAtTime(0.06, now+0.02);
+    g2.gain.exponentialRampToValueAtTime(0.001, now+0.1);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(now+0.02); o2.stop(now+0.1);
+  } catch(e){}
+}
+
+/* Success Chime */
+function playResultSound() {
+  if (!soundOn) return;
+  try {
+    const ctx = getAudioCtx(), now = ctx.currentTime;
+    const notes = [
+      {f:523, s:0, d:0.15},
+      {f:659, s:0.12, d:0.15},
+      {f:784, s:0.24, d:0.15},
+      {f:1047, s:0.38, d:0.4}
+    ];
+    notes.forEach(n => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='triangle';
+      o.frequency.setValueAtTime(n.f, now+n.s);
+      g.gain.setValueAtTime(0, now+n.s);
+      g.gain.linearRampToValueAtTime(0.2, now+n.s+0.03);
+      g.gain.setValueAtTime(0.2, now+n.s+n.d*0.65);
+      g.gain.exponentialRampToValueAtTime(0.001, now+n.s+n.d+0.18);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now+n.s); o.stop(now+n.s+n.d+0.18);
+    });
+    const on = ctx.createOscillator(), gn = ctx.createGain();
+    on.type='sine';
+    on.frequency.setValueAtTime(140, now+0.6);
+    on.frequency.exponentialRampToValueAtTime(70, now+0.75);
+    gn.gain.setValueAtTime(0.12, now+0.6);
+    gn.gain.exponentialRampToValueAtTime(0.001, now+0.78);
+    on.connect(gn); gn.connect(ctx.destination);
+    on.start(now+0.6); on.stop(now+0.78);
+  } catch(e){}
+}
+
+/* ═══════════════════════════════════════
+   📝  Quiz Data — 12 Questions
+   ═══════════════════════════════════════ */
+const QS = [
+  {
+    e:"📝", q:"교실 전자칠판이 갑자기 안 켜질 때, 당신의 첫마디는?",
+    a:[
+      {t:"A", txt:"흐음, IP 충돌인가? 코드를 좀 볼까?"},
+      {t:"B", txt:"설정 들어가서 재부팅 해보자."},
+      {t:"C", txt:"역시 기계는 믿을 게 못 돼. (분필을 든다)"},
+      {t:"D", txt:"내가 만져서 고장 났나 봐... (동공 지진)"},
+      {t:"E", txt:"잠깐만, 유튜브에 '전자칠판 안 켜질 때' 검색해볼게."},
+      {t:"F", txt:"Ctrl+Alt+Del 눌러봤니?"}
+    ]
+  },
+  {
+    e:"🔔", q:"학생이 '패드 로그인이 안 돼요!'라고 외치면?",
+    a:[
+      {t:"A", txt:"서버 관리자 페이지 열어볼 테니 기다려."},
+      {t:"B", txt:"비밀번호 초기화해줄게, QR 찍어."},
+      {t:"C", txt:"그냥 교과서 펴라. 그게 제일 빠르다."},
+      {t:"D", txt:"나도 로그인 안 돼서 지금 멍 때리고 있어."},
+      {t:"E", txt:"애들아, 일단 영상 하나 보고 있을까?"},
+      {t:"F", txt:"아이디 뒤에 @apps 붙였니? (한숨)"}
+    ]
+  },
+  {
+    e:"🤖", q:"'챗GPT'를 대하는 당신의 자세는?",
+    a:[
+      {t:"A", txt:"프롬프트를 3층 구조로 짜서 비서처럼 부린다."},
+      {t:"B", txt:"가끔 수업 아이디어가 막힐 때 슬쩍 물어본다."},
+      {t:"C", txt:"인공지능? 그거 다 거짓말쟁이라며?"},
+      {t:"D", txt:"무서워서 근처에도 안 간다."},
+      {t:"E", txt:"얘한테 나 대신 통지표 써달라고 하면 안 될까?"},
+      {t:"F", txt:"답변 속도가 느리다며 유료 결제 기능을 고민한다."}
+    ]
+  },
+  {
+    e:"📲", q:"새로운 교육용 앱이 유행할 때 당신은?",
+    a:[
+      {t:"A", txt:"이미 베타 테스터로 참여 중이다."},
+      {t:"B", txt:"일단 가입하고 연수 한 번 들어본다."},
+      {t:"C", txt:"내년이면 없어질 유행이겠지."},
+      {t:"D", txt:"회원가입 단계에서 '이메일 인증' 못 해서 포기한다."},
+      {t:"E", txt:"남들이 만든 템플릿 복제해서 이름만 바꾼다."},
+      {t:"F", txt:"기능 설명서(PDF)부터 다운로드해서 정독한다."}
+    ]
+  },
+  {
+    e:"🔗", q:"수업 중 당신의 크롬 브라우저 탭(Tab) 개수는?",
+    a:[
+      {t:"A", txt:"3개 (필요한 것만 딱 띄움)."},
+      {t:"B", txt:"10개 내외 (참고자료들)."},
+      {t:"C", txt:"크롬이 뭐지? 익스플로러(엣지) 하나면 충분하다."},
+      {t:"D", txt:"탭이 너무 많아서 글자가 안 보일 정도 (뭐 하나 끄면 큰일 남)."},
+      {t:"E", txt:"절반 이상이 유튜브와 쇼핑몰이다."},
+      {t:"F", txt:"단축키로 탭 사이를 빛의 속도로 이동한다."}
+    ]
+  },
+  {
+    e:"👨‍💻", q:"학생이 나보다 컴퓨터를 더 잘 다루는 것 같을 때?",
+    a:[
+      {t:"A", txt:"오, 너 코딩 좀 하는데? 나랑 같이 관리할래?"},
+      {t:"B", txt:"좋은 기능이네? 나도 좀 알려줘!"},
+      {t:"C", txt:"잔기술 부리지 말고 공부나 해."},
+      {t:"D", txt:"선생님이 일부러 틀린 거야. 너희가 아나 보려고."},
+      {t:"E", txt:"이거 어떻게 하는지 영상으로 좀 찍어줄래?"},
+      {t:"F", txt:"(자존심 상해서 집 가서 몰래 연습한다)"}
+    ]
+  },
+  {
+    e:"🤝", q:"온라인 공동 작업(구글 문서 등)을 할 때 당신은?",
+    a:[
+      {t:"A", txt:"다른 샘들이 들어오기 전에 서식을 완벽하게 짜둔다."},
+      {t:"B", txt:"내 영역에 묵묵히 내 할 일만 적는다."},
+      {t:"C", txt:"내가 쓴 글자가 자꾸 지워진다며 화를 낸다."},
+      {t:"D", txt:"남의 글자를 실수로 다 지워버리고 '실행 취소'를 몰라 땀 흘린다."},
+      {t:"E", txt:"남들이 적는 거 구경하다가 커서로 장난친다."},
+      {t:"F", txt:"익명 동물을 보면 누군지 맞추는 재미에 빠진다."}
+    ]
+  },
+  {
+    e:"🖥️", q:"당신의 바탕화면 상태는?",
+    a:[
+      {t:"A", txt:"폴더 하나 없이 배경화면만 있는 미니멀리즘."},
+      {t:"B", txt:"학년/업무별로 깔끔하게 정리된 폴더들."},
+      {t:"C", txt:"파일들이 비처럼 내려와 배경화면 얼굴을 다 가림."},
+      {t:"D", txt:"'새 폴더(99)' 안에 '진짜 최종' 파일이 들어있음."},
+      {t:"E", txt:"예쁜 아이돌이나 귀여운 강아지 사진이 메인."},
+      {t:"F", txt:"모든 파일이 '이름순'으로 정렬되어 있음."}
+    ]
+  },
+  {
+    e:"🎓", q:"원격 연수를 들을 때 당신의 모습은?",
+    a:[
+      {t:"A", txt:"2배속으로 듣고 퀴즈까지 100점으로 마친다."},
+      {t:"B", txt:"켜놓고 다른 업무를 보며 가끔 클릭해준다."},
+      {t:"C", txt:"소리가 안 나와서 1시간 동안 볼륨 조절만 한다."},
+      {t:"D", txt:"캠이 켜진 줄 모르고 하품하다가 전국 교사들에게 생중계된다."},
+      {t:"E", txt:"댓글창에 '출석했습니다!'만 10번 남긴다."},
+      {t:"F", txt:"강의 내용을 실시간으로 타이핑해서 요약본을 만든다."}
+    ]
+  },
+  {
+    e:"🎨", q:"'캔바(Canva)'로 학습지를 만들 때?",
+    a:[
+      {t:"A", txt:"레이어를 나누고 커스텀 폰트를 적용해 예술 작품을 만든다."},
+      {t:"B", txt:"예쁜 템플릿 골라서 글자만 바꾼다."},
+      {t:"C", txt:"한글(HWP) 표 만들기가 세상에서 제일 편하다."},
+      {t:"D", txt:"마우스 드래그가 안 돼서 도형이 자꾸 하늘로 날아간다."},
+      {t:"E", txt:"남이 만든 거 '공유' 받아서 이름만 슬쩍 바꾼다."},
+      {t:"F", txt:"단축키를 써서 5분 만에 뚝딱 만든다."}
+    ]
+  },
+  {
+    e:"📬", q:"교내 메신저에 '쪽지'가 오면?",
+    a:[
+      {t:"A", txt:"알림음이 울리기도 전에 팝업을 낚아챈다."},
+      {t:"B", txt:"확인하고 바로 답장을 보낸다."},
+      {t:"C", txt:"쪽지 함이 99+인데 안 읽는다."},
+      {t:"D", txt:"답장 쓰다가 실수로 전체 공지를 날린다."},
+      {t:"E", txt:"귀여운 이모티콘부터 찾는다."},
+      {t:"F", txt:"예약 전송 기능을 활용해 업무 효율을 높인다."}
+    ]
+  },
+  {
+    e:"🌟", q:"당신에게 '스마트 교실'이란?",
+    a:[
+      {t:"A", txt:"내 능력을 무한대로 펼칠 수 있는 놀이터."},
+      {t:"B", txt:"적응해야만 살아남는 비즈니스 현장."},
+      {t:"C", txt:"아이들이 눈 나빠지는 지름길."},
+      {t:"D", txt:"언제 터질지 모르는 시한폭탄."},
+      {t:"E", txt:"수업 때 영상 틀어주기 편한 곳."},
+      {t:"F", txt:"단축키 5개로 모든 게 해결되는 편리한 곳."}
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════
+   🏆  Result Types
+   ═══════════════════════════════════════ */
+const TYPES = {
+  A: { emoji:"🧚", cls:"type-A", label:"A유형",
+       title:"AI 마법사 - 빌 게이츠의 환생",
+       desc:"기계가 당신을 무서워합니다! 코딩부터 AI 활용까지 못 하는 게 없는 교실 속의 스티브 잡스. 정보부장님도 당신에겐 고개를 숙입니다.",
+       work:"에듀테크 전략, 인프라 구축, AI 커리큘럼",
+       item:"기계식 키보드와 4K 모니터" },
+  B: { emoji:"🔧", cls:"type-B", label:"B유형",
+       title:"구글 워커 - 스마트 교실의 정석",
+       desc:"도구의 노예가 되지 않고 도구를 지배하는 자! 효율적인 협업 툴 활용으로 퇴근 시간을 앞당기는 스마트 교사의 표본입니다.",
+       work:"협업 플랫폼 관리, 업무 프로세스 최적화",
+       item:"태블릿 전용 펜슬과 유료 앱 구독권" },
+  C: { emoji:"✏️", cls:"type-C", label:"C유형",
+       title:"아날로그 장인 - 분필과 칠판의 수호자",
+       desc:"'진정한 교육은 눈과 눈을 맞추는 것!' 디지털 파도 속에서도 굳건히 아날로그의 가치를 지키는 장인입니다. 하지만 가끔은 전원 버튼도 눌러보세요.",
+       work:"전통 교육법 자산화, 오프라인 콘텐츠 개발",
+       item:"최고급 분필 홀더와 가죽 다이어리" },
+  D: { emoji:"💥", cls:"type-D", label:"D유형",
+       title:"기계 파괴자 - 마이너스의 손",
+       desc:"당신이 만지기만 하면 에러가 납니다! 기계와 영적 교류가 안 되는 타입. 하지만 괜찮아요, 선생님에겐 인간적인 매력이 넘치니까요!",
+       work:"인간관계, 따뜻한 피드백, 아날로그 업무",
+       item:"'컴퓨터 안 될 때 읽는 책'과 정보부장님 전화번호" },
+  E: { emoji:"📺", cls:"type-E", label:"E유형",
+       title:"유튜브 컬렉터 - 영상 교육의 대가",
+       desc:"'자, 오늘은 이 영상을 볼 거예요.' 세상 모든 지식을 유튜브로 가르치는 분. 아이들이 선생님보다 유튜버 이름을 더 잘 압니다.",
+       work:"영상 큐레이션, 콘텐츠 기획, 채널 운영",
+       item:"유튜브 프리미엄 구독권과 고성능 스피커" },
+  F: { emoji:"⚡", cls:"type-F", label:"F유형",
+       title:"단축키 마스터 - 0.1초의 승부사",
+       desc:"마우스는 거들 뿐! 모든 업무를 키보드 하나로 끝내는 인간 매크로. 당신의 손가락은 눈보다 빠릅니다.",
+       work:"자동화 스크립트, 효율 극대화, 시간 관리",
+       item:"손목 보호대와 커스텀 키캡" }
+};
+
+const TYPE_KEYS = ['A','B','C','D','E','F'];
+const TYPE_NAMES = ['AI마법사','구글워커','아날로그','기계파괴','유튜브','단축키'];
+
+/* ═══════════════════════════════════════
+   🎮  Quiz Logic
+   ═══════════════════════════════════════ */
+let cur = 0;
+let sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+let lastRes = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function beginQuiz() {
+  cur = 0;
+  sc = {A:0,B:0,C:0,D:0,E:0,F:0};
+  show('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const d = QS[cur];
+  document.getElementById('elQNum').textContent = `Q${String(cur+1).padStart(2,'0')}`;
+  document.getElementById('elQCount').textContent = `${cur+1} / 12`;
+  document.getElementById('elProgress').style.width = `${(cur/12)*100}%`;
+
+  const sec = document.getElementById('elQSection');
+  sec.style.animation='none'; sec.offsetHeight;
+  sec.style.animation='fadeSlide 0.45s ease both';
+
+  document.getElementById('elQText').innerHTML = `<span class="q-emoji">${d.e}</span> ${d.q}`;
+
+  const g = document.getElementById('elAnswers');
+  g.innerHTML = '';
+  d.a.forEach((ans, i) => {
+    const b = document.createElement('button');
+    b.className = 'answer-btn';
+    b.innerHTML = `<span class="num-badge">${ans.t}</span><span>${ans.txt}</span>`;
+    b.onclick = () => pick(ans.t, b);
+    g.appendChild(b);
+  });
+}
+
+function pick(type, btn) {
+  document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  sc[type]++;
+  playSelectSound();
+
+  setTimeout(() => {
+    cur++;
+    if (cur >= 12) showResult();
+    else renderQ();
+  }, 380);
+}
+
+function showResult() {
+  show('screenResult');
+  document.getElementById('elProgress').style.width = '100%';
+
+  let maxVal = 0, winner = 'A';
+  TYPE_KEYS.forEach(k => { if (sc[k] > maxVal) { maxVal = sc[k]; winner = k; } });
+
+  const r = TYPES[winner];
+  lastRes = { r, winner, scores: {...sc} };
+
+  spawnConfetti();
+  playResultSound();
+
+  let barsHTML = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (sc[k]/12)*100;
+    barsHTML += `<div class="bar-row">
+      <span class="bar-label">${TYPE_NAMES[i]}</span>
+      <div class="bar-track"><div class="bar-fill bf-${k}" id="bf${k}" data-w="${pct}"></div></div>
+      <span class="bar-pts">${sc[k]}점</span>
+    </div>`;
+  });
+
+  document.getElementById('elResult').innerHTML = `
+    <div class="res-emoji">${r.emoji}</div>
+    <div class="res-type-badge ${r.cls}">${r.label}</div>
+    <div class="res-title">[ ${r.title} ]</div>
+    <div class="res-desc">${r.desc}</div>
+    <div class="res-info-row">
+      <div class="res-info-box work-box">
+        <div class="info-label">💼 추천 업무</div>
+        <div class="info-value">${r.work}</div>
+      </div>
+      <div class="res-info-box item-box">
+        <div class="info-label">🎁 추천 아이템</div>
+        <div class="info-value">${r.item}</div>
+      </div>
+    </div>
+    <div class="score-section">
+      <h3>📊 유형별 점수 분석</h3>
+      ${barsHTML}
+    </div>
+    <div class="result-actions">
+      <button class="save-btn" id="saveBtn" onclick="saveResult()">내 결과 저장하기 📸</button>
+      <button class="retry-btn" onclick="goHome()">다시 진단하기 🔄</button>
+    </div>
+  `;
+
+  setTimeout(() => {
+    TYPE_KEYS.forEach(k => {
+      const el = document.getElementById('bf'+k);
+      if (el) el.style.width = el.dataset.w + '%';
+    });
+  }, 350);
+}
+
+function goHome() {
+  const c = document.querySelector('.confetti-box');
+  if(c) c.remove();
+  show('screenStart');
+}
+
+function spawnConfetti() {
+  const old = document.querySelector('.confetti-box');
+  if(old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const cols = ['#4cb7ff','#b3ff4c','#ffd166','#ff6b9d','#d946ef','#ff4757','#80deea','#69f0ae','#ffc940','#ff7043'];
+  for(let i=0;i<100;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti-dot';
+    d.style.left = Math.random()*100+'%';
+    d.style.background = cols[Math.floor(Math.random()*cols.length)];
+    d.style.width = (Math.random()*10+5)+'px';
+    d.style.height = (Math.random()*10+5)+'px';
+    d.style.animationDuration = (Math.random()*2.6+2.2)+'s';
+    d.style.animationDelay = (Math.random()*2)+'s';
+    d.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    box.appendChild(d);
+  }
+  setTimeout(()=>box.remove(), 6500);
+}
+
+/* ═══════════════════════════════════════
+   📸  Save Result
+   ═══════════════════════════════════════ */
+const capBgMap = {
+  'type-A':'linear-gradient(135deg,#0a0e27 0%,#0f2855 50%,#0a0e27 100%)',
+  'type-B':'linear-gradient(135deg,#0a0e27 0%,#1a4d2e 50%,#0a0e27 100%)',
+  'type-C':'linear-gradient(135deg,#0a0e27 0%,#4d3a1a 50%,#0a0e27 100%)',
+  'type-D':'linear-gradient(135deg,#0a0e27 0%,#4d1a2e 50%,#0a0e27 100%)',
+  'type-E':'linear-gradient(135deg,#0a0e27 0%,#4d2e1a 50%,#0a0e27 100%)',
+  'type-F':'linear-gradient(135deg,#0a0e27 0%,#4d1a1a 50%,#0a0e27 100%)',
+};
+
+const capBadgeBg = {
+  'type-A':'linear-gradient(135deg,#4cb7ff,#0095ff)',
+  'type-B':'linear-gradient(135deg,#b3ff4c,#9dff00)',
+  'type-C':'linear-gradient(135deg,#ffd166,#ffb700)',
+  'type-D':'linear-gradient(135deg,#ff6b9d,#ff4d6d)',
+  'type-E':'linear-gradient(135deg,#d946ef,#c100ff)',
+  'type-F':'linear-gradient(135deg,#ff4757,#ff6b6b)',
+};
+
+const capBadgeCol = {
+  'type-A':'#fff','type-B':'#000','type-C':'#000',
+  'type-D':'#fff','type-E':'#fff','type-F':'#fff',
+};
+
+async function saveResult() {
+  if (!lastRes) return;
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중... ⏳';
+
+  const {r, winner, scores} = lastRes;
+
+  let barsH = '';
+  TYPE_KEYS.forEach((k,i) => {
+    const pct = (scores[k]/12)*100;
+    barsH += `<div class="cap-br">
+      <span class="cap-bl">${TYPE_NAMES[i]}</span>
+      <div class="cap-bt"><div class="cap-bf" style="width:${pct}%"></div></div>
+      <span class="cap-bp">${scores[k]}</span>
+    </div>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'capture-card';
+  card.style.background = capBgMap[r.cls];
+  card.innerHTML = `
+    <div class="cap-emoji">${r.emoji}</div>
+    <div class="cap-badge" style="background:${capBadgeBg[r.cls]};color:${capBadgeCol[r.cls]}">${r.label}</div>
+    <div class="cap-title">[ ${r.title} ]</div>
+    <div class="cap-desc">${r.desc}</div>
+    <div class="cap-info-row">
+      <div class="cap-info-box cap-work">
+        <div class="cap-il">💼 추천 업무</div>
+        <div class="cap-iv">${r.work}</div>
+      </div>
+      <div class="cap-info-box cap-item">
+        <div class="cap-il">🎁 추천 아이템</div>
+        <div class="cap-iv">${r.item}</div>
+      </div>
+    </div>
+    <div class="cap-bars">${barsH}</div>
+    <div class="cap-wm">💻 나의 에듀테크 숙련도 레벨 테스트 · 시리즈 9탄</div>
+  `;
+
+  document.body.appendChild(card);
+
+  try {
+    await new Promise(res => setTimeout(res, 300));
+    const canvas = await html2canvas(card, {
+      scale:2, backgroundColor:'#0a0e27',
+      useCORS:true, logging:false,
+      width:640, windowWidth:640
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `에듀테크_${r.label}.png`, {type:'image/png'});
+        const shareData = {files:[file], title:'나의 에듀테크 숙련도 레벨 테스트', text:`나의 에듀테크 유형은 ${r.label}! - ${r.title}`};
+        try {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            card.remove();
+            btn.classList.remove('saving');
+            btn.textContent = '내 결과 저장하기 📸';
+            return;
+          }
+        } catch(e){}
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `에듀테크_${r.label}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      card.remove();
+      btn.classList.remove('saving');
+      btn.innerHTML = '저장 완료! ✅';
+      setTimeout(()=>{ btn.textContent='내 결과 저장하기 📸'; }, 2000);
+    }, 'image/png');
+
+  } catch(e) {
+    console.error('Capture failed:', e);
+    card.remove();
+    btn.classList.remove('saving');
+    btn.textContent = '내 결과 저장하기 📸';
+    alert('이미지 저장에 실패했습니다. 스크린샷을 이용해주세요.');
+  }
+}
+</script>
+</body>
+</html>

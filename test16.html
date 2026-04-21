@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💹 금융 DNA 포트폴리오 밸런스 테스트</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #04070f;
+  --bg2:       #080d1a;
+  --bg3:       #0d1424;
+  --card:      rgba(255,255,255,0.04);
+  --card2:     rgba(255,255,255,0.07);
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.15);
+  --green:     #00d084;
+  --green-dim: rgba(0,208,132,0.12);
+  --red:       #ff4757;
+  --gold:      #ffc107;
+  --blue:      #3d9eff;
+  --text:      #e8edf5;
+  --muted:     #4e5e7a;
+  --dim:       #8898b0;
+  --r:         14px;
+  --mono:      'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Grid Background ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,208,132,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,208,132,0.03) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none; z-index:0;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  height: 48px;
+  background: rgba(4,7,15,0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  display: flex; align-items: center;
+  padding: 0 24px;
+  gap: 20px;
+}
+.topbar-logo {
+  font-family: var(--mono);
+  font-size: 13px; font-weight:700;
+  color: var(--green);
+  letter-spacing:1.5px;
+  display:flex; align-items:center; gap:6px;
+}
+.topbar-logo::before{
+  content:'';
+  width:7px; height:7px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot{
+  0%,100%{opacity:1; box-shadow:0 0 0 0 rgba(0,208,132,0.4);}
+  50%{opacity:0.7; box-shadow:0 0 0 6px transparent;}
+}
+.topbar-ticker {
+  flex:1; overflow:hidden;
+  font-family:var(--mono); font-size:11px;
+  display:flex; gap:24px;
+  mask-image:linear-gradient(90deg,transparent,black 10%,black 90%,transparent);
+}
+.tick-item { display:inline-flex; gap:6px; white-space:nowrap; color:var(--muted); }
+.tick-up{color:var(--green);} .tick-dn{color:var(--red);}
+
+/* ── Container ── */
+.wrap {
+  position:relative; z-index:1;
+  max-width:680px;
+  margin:0 auto;
+  padding:68px 20px 60px;
+}
+
+/* ── Screens ── */
+.screen{display:none;}
+.screen.on{display:block; animation:screenIn 0.45s cubic-bezier(.23,1,.32,1) both;}
+@keyframes screenIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ────────────────
+   INTRO SCREEN
+─────────────────── */
+.intro-eyebrow {
+  font-family:var(--mono); font-size:11px;
+  color:var(--green); letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:12px;
+}
+.intro-h1 {
+  font-size: clamp(28px,6vw,44px);
+  font-weight:900;
+  line-height:1.2;
+  margin-bottom:10px;
+}
+.intro-h1 em { font-style:normal; color:var(--green); }
+.intro-sub {
+  font-size:15px; color:var(--dim); line-height:1.8;
+  margin-bottom:36px; font-weight:300;
+}
+
+.intro-stats {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; margin-bottom:36px;
+}
+.stat-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:18px 16px;
+}
+.stat-card .lbl {
+  font-family:var(--mono); font-size:10px; color:var(--muted);
+  letter-spacing:1px; text-transform:uppercase; margin-bottom:8px;
+}
+.stat-card .val {
+  font-family:var(--mono); font-size:22px; font-weight:700;
+  color:var(--green);
+}
+
+.asset-preview {
+  display:grid; grid-template-columns:repeat(5,1fr);
+  gap:8px; margin-bottom:36px;
+}
+.ap-chip {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 6px;
+  text-align:center;
+}
+.ap-chip .ico{font-size:18px; margin-bottom:4px;}
+.ap-chip .nm{font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:0.5px;}
+
+.btn-primary {
+  width:100%;
+  padding:20px;
+  background:linear-gradient(135deg,#00d084,#00b070);
+  border:none; border-radius:var(--r);
+  color:#020c08; font-family:'Noto Sans KR',sans-serif;
+  font-size:18px; font-weight:900;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+  box-shadow:0 8px 32px rgba(0,208,132,0.3);
+  position:relative; overflow:hidden;
+}
+.btn-primary::after{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,208,132,0.4);}
+.btn-primary:active{transform:translateY(0);}
+
+.disclaimer-txt{
+  text-align:center; font-size:11px; color:var(--muted);
+  margin-top:12px; font-family:var(--mono);
+}
+
+/* ────────────────
+   QUIZ SCREEN
+─────────────────── */
+.q-progress-row{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.q-progress-label{font-family:var(--mono); font-size:12px; color:var(--dim);}
+.q-progress-pct{font-family:var(--mono); font-size:12px; color:var(--green); font-weight:700;}
+.q-track{
+  height:4px; background:var(--card2);
+  border-radius:2px; margin-bottom:28px; overflow:hidden;
+}
+.q-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--green),#00ffaa);
+  border-radius:2px;
+  transition:width .5s cubic-bezier(.23,1,.32,1);
+}
+
+.q-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:28px 24px;
+  margin-bottom:16px;
+  position:relative; overflow:hidden;
+}
+.q-card::before{
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--green),var(--blue),var(--gold));
+}
+.q-number{
+  font-family:var(--mono); font-size:11px; font-weight:700;
+  color:var(--green); letter-spacing:2px; margin-bottom:10px;
+}
+.q-text{
+  font-size:clamp(16px,3.5vw,20px); font-weight:700;
+  line-height:1.5; color:var(--text);
+}
+.q-emoji{margin-right:6px;}
+
+.opts-list{ display:flex; flex-direction:column; gap:10px; }
+
+.opt-btn {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:16px 18px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:14px; font-weight:400;
+  line-height:1.6;
+  cursor:pointer; text-align:left;
+  transition:all .2s;
+  word-break:keep-all;
+}
+.opt-btn:hover{
+  background:rgba(0,208,132,0.08);
+  border-color:rgba(0,208,132,0.4);
+  transform:translateX(4px);
+}
+.opt-btn.picked{
+  background:rgba(0,208,132,0.12);
+  border-color:var(--green);
+  animation:pickFlash .3s ease;
+}
+@keyframes pickFlash{
+  0%{background:rgba(0,208,132,0.35);}
+  100%{background:rgba(0,208,132,0.12);}
+}
+.opt-btn:disabled{pointer-events:none;}
+
+.opt-key{
+  width:26px; height:26px; flex-shrink:0;
+  background:var(--card2); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:11px; font-weight:700;
+  color:var(--dim); transition:all .2s; margin-top:2px;
+}
+.opt-btn.picked .opt-key{background:var(--green); color:#020c08;}
+
+/* ────────────────
+   LOADING SCREEN
+─────────────────── */
+.loading-wrap{
+  text-align:center; padding:60px 20px;
+}
+.loading-ring{
+  width:80px; height:80px;
+  border:3px solid var(--border2);
+  border-top-color:var(--green);
+  border-radius:50%;
+  margin:0 auto 24px;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-h{font-size:20px; font-weight:700; margin-bottom:8px;}
+.loading-sub{font-family:var(--mono); font-size:12px; color:var(--dim);}
+.loading-steps{
+  list-style:none; max-width:300px;
+  margin:32px auto 0; text-align:left;
+}
+.l-step{
+  font-family:var(--mono); font-size:12px;
+  color:var(--muted); padding:9px 0;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transform:translateX(-8px);
+  transition:all .4s ease;
+}
+.l-step::before{content:'○'; color:var(--muted);}
+.l-step.done{opacity:1; transform:none; color:var(--green);}
+.l-step.done::before{content:'✓';}
+
+/* ────────────────
+   RESULT SCREEN
+─────────────────── */
+.res-eyebrow{
+  font-family:var(--mono); font-size:11px; color:var(--green);
+  letter-spacing:3px; text-transform:uppercase; margin-bottom:8px;
+}
+.res-h1{font-size:clamp(22px,5vw,32px); font-weight:900; margin-bottom:4px;}
+.res-sub{font-size:14px; color:var(--dim); margin-bottom:24px; font-weight:300;}
+
+/* chart + legend */
+.chart-section{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:20px;
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:24px;
+  align-items:center;
+}
+@media(max-width:540px){
+  .chart-section{grid-template-columns:1fr; text-align:center;}
+}
+.chart-wrap{
+  position:relative; width:200px; height:200px;
+  margin:0 auto;
+}
+.chart-center{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.chart-center .top-pct{
+  font-family:var(--mono); font-size:26px; font-weight:700;
+}
+.chart-center .top-name{
+  font-family:var(--mono); font-size:10px;
+  color:var(--dim); letter-spacing:1px; text-transform:uppercase;
+  margin-top:2px;
+}
+
+.legend-list{display:flex; flex-direction:column; gap:8px;}
+.legend-item{
+  display:flex; align-items:center; gap:10px;
+}
+.legend-dot{
+  width:10px; height:10px; border-radius:50%; flex-shrink:0;
+}
+.legend-name{
+  font-family:var(--mono); font-size:12px; color:var(--dim); flex:1;
+}
+.legend-pct{
+  font-family:var(--mono); font-size:13px; font-weight:700;
+}
+.legend-bar-wrap{
+  width:60px; height:4px;
+  background:var(--card2); border-radius:2px; overflow:hidden;
+}
+.legend-bar{height:100%; border-radius:2px;}
+
+/* top 3 roast */
+.roast-title{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.roast-cards{display:flex; flex-direction:column; gap:12px; margin-bottom:24px;}
+
+.roast-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  position:relative; overflow:hidden;
+}
+.roast-card::before{
+  content:'';
+  position:absolute; top:0; left:0;
+  width:3px; height:100%;
+}
+.roast-rank{
+  font-family:var(--mono); font-size:10px; color:var(--muted);
+  letter-spacing:1px; margin-bottom:6px;
+}
+.roast-header{
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+.roast-emoji{font-size:22px;}
+.roast-asset-name{font-size:15px; font-weight:700;}
+.roast-asset-pct{
+  font-family:var(--mono); font-size:13px; font-weight:700;
+  margin-left:auto;
+}
+.roast-text{
+  font-size:13px; line-height:1.85; color:var(--dim);
+  word-break:keep-all;
+}
+.roast-text em{font-style:normal; color:var(--text); font-weight:600;}
+
+/* buttons */
+.result-actions{
+  display:flex; gap:12px; margin-bottom:8px;
+}
+.btn-capture{
+  flex:1; padding:18px;
+  background:linear-gradient(135deg,var(--gold),#e69100);
+  border:none; border-radius:var(--r);
+  color:#0a0600; font-family:'Noto Sans KR',sans-serif;
+  font-size:16px; font-weight:900;
+  cursor:pointer; transition:all .2s;
+  box-shadow:0 6px 24px rgba(255,193,7,0.25);
+}
+.btn-capture:hover{transform:translateY(-2px); box-shadow:0 10px 32px rgba(255,193,7,0.35);}
+.btn-capture.saving{opacity:.6; pointer-events:none;}
+
+.btn-retry{
+  flex:1; padding:18px;
+  background:transparent;
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  color:var(--dim); font-family:'Noto Sans KR',sans-serif;
+  font-size:16px; font-weight:700;
+  cursor:pointer; transition:all .2s;
+}
+.btn-retry:hover{border-color:var(--blue); color:var(--blue);}
+
+/* ────────────────
+   CAPTURE CARD
+─────────────────── */
+#capture-card{
+  position:fixed; left:-9999px; top:0;
+  width:560px; padding:36px 32px 28px;
+  background:#070c18;
+  font-family:'Noto Sans KR',sans-serif;
+  color:#e8edf5;
+  z-index:-1;
+}
+.cap-header{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:20px;
+  padding-bottom:14px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.cap-logo{
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+  color:#00d084; letter-spacing:2px; text-transform:uppercase;
+}
+.cap-ep{
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:rgba(255,255,255,0.3); letter-spacing:1px;
+}
+.cap-top-title{
+  font-size:18px; font-weight:900; margin-bottom:2px;
+}
+.cap-top-sub{
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:rgba(255,255,255,0.4); margin-bottom:20px;
+}
+.cap-body{
+  display:grid; grid-template-columns:180px 1fr; gap:20px;
+  margin-bottom:20px; align-items:start;
+}
+.cap-chart-img{width:180px; height:180px; border-radius:50%;}
+.cap-legend{display:flex; flex-direction:column; gap:7px; padding-top:4px;}
+.cap-leg-row{display:flex; align-items:center; gap:8px;}
+.cap-leg-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+.cap-leg-name{font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,255,255,0.5); flex:1;}
+.cap-leg-pct{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;}
+.cap-divider{height:1px; background:rgba(255,255,255,0.07); margin:16px 0;}
+.cap-analysis-title{
+  font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(255,255,255,0.3);
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;
+}
+.cap-roast-item{margin-bottom:12px;}
+.cap-roast-head{
+  display:flex; align-items:center; gap:8px; margin-bottom:4px;
+}
+.cap-roast-name{font-size:13px; font-weight:700;}
+.cap-roast-pct{
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+  margin-left:auto;
+}
+.cap-roast-txt{font-size:11px; line-height:1.7; color:rgba(255,255,255,0.5);}
+.cap-footer{
+  text-align:center; margin-top:16px;
+  font-family:'JetBrains Mono',monospace; font-size:9px;
+  color:rgba(255,255,255,0.2); letter-spacing:1px;
+  border-top:1px solid rgba(255,255,255,0.07); padding-top:12px;
+}
+
+/* Responsive */
+@media(max-width:480px){
+  .intro-stats{grid-template-columns:1fr 1fr 1fr;}
+  .asset-preview{grid-template-columns:repeat(5,1fr);}
+  .q-card{padding:22px 18px;}
+  .opt-btn{font-size:13px; padding:14px 14px;}
+  .result-actions{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">FIN·DNA</div>
+  <div class="topbar-ticker" id="ticker"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ═══ INTRO ═══ -->
+  <div class="screen on" id="s-intro">
+    <div class="intro-eyebrow">📊 PORTFOLIO ANALYSIS ENGINE v2.0</div>
+    <h1 class="intro-h1">금융 DNA<br><em>포트폴리오 밸런스 테스트</em></h1>
+    <p class="intro-sub">
+      10개의 질문으로 분석하는 당신의 투자 본능.<br>
+      <strong style="color:var(--gold)">팩트 폭격 주의.</strong> 결과가 불편할 수 있습니다.
+    </p>
+
+    <div class="intro-stats">
+      <div class="stat-card"><div class="lbl">총 문항</div><div class="val">10 Q</div></div>
+      <div class="stat-card"><div class="lbl">자산 유형</div><div class="val">10종</div></div>
+      <div class="stat-card"><div class="lbl">소요 시간</div><div class="val">~4분</div></div>
+    </div>
+
+    <div class="asset-preview" id="assetPreview"></div>
+
+    <button class="btn-primary" onclick="startQuiz()">💹 &nbsp;내 금융 DNA 분석 시작</button>
+    <p class="disclaimer-txt">* 실제 투자 권유가 아닙니다. 결과의 팩트에 너무 상처받지 마세요.</p>
+  </div>
+
+  <!-- ═══ QUIZ ═══ -->
+  <div class="screen" id="s-quiz">
+    <div class="q-progress-row">
+      <span class="q-progress-label" id="qLabel">Q 1 / 10</span>
+      <span class="q-progress-pct" id="qPct">0%</span>
+    </div>
+    <div class="q-track"><div class="q-fill" id="qFill" style="width:0%"></div></div>
+    <div class="q-card">
+      <div class="q-number" id="qNum">Q.01</div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="opts-list" id="optsList"></div>
+  </div>
+
+  <!-- ═══ LOADING ═══ -->
+  <div class="screen" id="s-loading">
+    <div class="loading-wrap">
+      <div class="loading-ring"></div>
+      <div class="loading-h">📊 포트폴리오 분석 중</div>
+      <div class="loading-sub">AI가 당신의 금융 DNA를 해부하고 있습니다...</div>
+      <ul class="loading-steps">
+        <li class="l-step" id="ls1">답변 데이터 수집 완료</li>
+        <li class="l-step" id="ls2">10개 자산군 비율 계산 중</li>
+        <li class="l-step" id="ls3">포트폴리오 리스크 지수 산출</li>
+        <li class="l-step" id="ls4">팩트 폭격 코멘트 로딩...</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══ RESULT ═══ -->
+  <div class="screen" id="s-result">
+    <div class="res-eyebrow">분석 완료 · PORTFOLIO DNA</div>
+    <h2 class="res-h1" id="resTitle">당신의 금융 포트폴리오</h2>
+    <p class="res-sub" id="resSub"></p>
+
+    <!-- Chart + Legend -->
+    <div class="chart-section">
+      <div class="chart-wrap">
+        <canvas id="donutChart" width="200" height="200"></canvas>
+        <div class="chart-center">
+          <div class="top-pct" id="centerPct" style="color:var(--green);">0%</div>
+          <div class="top-name" id="centerName">--</div>
+        </div>
+      </div>
+      <div class="legend-list" id="legendList"></div>
+    </div>
+
+    <!-- Top 3 Roast -->
+    <div class="roast-title">📢 팩트 폭격 분석 리포트</div>
+    <div class="roast-cards" id="roastCards"></div>
+
+    <!-- Buttons -->
+    <div class="result-actions">
+      <button class="btn-capture" id="btnCapture" onclick="captureResult()">📸 &nbsp;내 금융 DNA 캡처하기</button>
+      <button class="btn-retry" onclick="restartQuiz()">↩ 다시 분석</button>
+    </div>
+    <p class="disclaimer-txt">* 이 결과는 유머 기반 분석입니다. 실제 투자 결정에 사용하지 마세요.</p>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- Capture Card (off-screen) -->
+<div id="capture-card"></div>
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+
+// Asset order: 0=예적금 1=현금 2=채권 3=금 4=배당주 5=대형주 6=성장주 7=ETF 8=레버리지ETF 9=비트코인
+const ASSETS = [
+  { name:'예적금',      emoji:'🏦', color:'#22d3ee', mono:true  },
+  { name:'현금',        emoji:'💵', color:'#86efac', mono:false },
+  { name:'채권',        emoji:'📜', color:'#a78bfa', mono:false },
+  { name:'금',          emoji:'🥇', color:'#fbbf24', mono:false },
+  { name:'배당주',      emoji:'💰', color:'#fb7185', mono:false },
+  { name:'대형주',      emoji:'🏢', color:'#818cf8', mono:false },
+  { name:'성장주',      emoji:'🚀', color:'#34d399', mono:false },
+  { name:'ETF',         emoji:'📊', color:'#60a5fa', mono:true  },
+  { name:'레버리지 ETF',emoji:'⚡', color:'#f87171', mono:false },
+  { name:'비트코인',    emoji:'₿',  color:'#fb923c', mono:false },
+];
+
+const ROASTS = [
+  // 0 예적금
+  (p) => `포트폴리오의 <em>${p}%가 예적금</em>이군요. 은행 직원이 당신을 VIP 고객으로 정성껏 대접하는 이유가 있습니다. 안타깝게도 물가상승률이 당신의 이자를 <em>조용히, 그러나 확실하게</em> 갉아먹는 중입니다만, 밤에 숙면하신다는 것만큼은 인정합니다.`,
+  // 1 현금
+  (p) => `<em>${p}%가 현금</em>이군요. '기회를 노리는 전략적 대기'인지, '그냥 결정을 미루는 것'인지 — 아직 구분이 안 됩니다. 현금은 매년 인플레이션에 두들겨 맞고 있다는 사실, <em>알고는 계신 거죠?</em>`,
+  // 2 채권
+  (p) => `<em>${p}%가 채권</em>형 자산이군요. 수면제 없이도 잘 주무실 것 같습니다. 채권만큼 평탄한 수익률 곡선이 없으니까요. 금리 인상기에는 채권 가격이 <em>역방향으로 움직인다</em>는 사실은... 이미 아시겠죠?`,
+  // 3 금
+  (p) => `<em>${p}%가 금</em>이군요. 이집트 파라오도 금을 좋아했는데, 취향 하나는 고급집니다. 금은 이자도 배당도 없지만, <em>수천 년째 가치가 있다</em>는 게 금의 유일한 논리입니다. 흔들리지 마세요.`,
+  // 4 배당주
+  (p) => `<em>${p}%가 배당주</em>군요. 월급 외에 또 다른 월급을 꿈꾸는 현명한 당신. '돈이 돈을 버는' 시스템에 드디어 눈을 떴군요. 단, 배당 삭감 공지가 뜨는 날 <em>심장이 철렁할 준비</em>는 해두세요.`,
+  // 5 대형주
+  (p) => `<em>${p}%가 대형주</em>군요. 삼성, 애플, 마이크로소프트... 망할 것 같지 않은 것만 사는 당신의 전략, 아주 합리적입니다. 이 기업들이 망하는 날엔 <em>그냥 세상이 망한 거</em>니까 계좌 걱정은 부질없을 겁니다.`,
+  // 6 성장주
+  (p) => `<em>${p}%가 성장주</em>군요. 10배? 아니, 100배? 당신의 상상력은 이미 우주를 달립니다. 그 종목이 <em>-70%를 찍을 때도</em> 지금의 낙관론을 유지할 수 있는지가 진짜 관건입니다.`,
+  // 7 ETF
+  (p) => `<em>${p}%가 ETF</em>군요. 복잡한 것 싫고 시장 평균만 먹겠다는 그 소박한 욕심 — 사실 이게 <em>대부분의 펀드매니저보다 나은 전략</em>입니다. 당신, 꽤 현명합니다. 이 테스트에서 가장 칭찬받는 유형입니다.`,
+  // 8 레버리지 ETF
+  (p) => `<em>${p}%가 레버리지 ETF</em>군요. 2배, 아니 3배를 원하시는군요. 장기 보유 시 '변동성 드래그'로 수익률이 <em>음수로 수렴</em>하는 현상이 있는데... 천천히 알아가세요. 제발 3개월 뒤에도 계좌가 살아있길 빕니다.`,
+  // 9 비트코인
+  (p) => `<em>${p}%가 비트코인</em>이군요. 기존 금융 시스템에 반기를 드신 진정한 혁명가. 달에 갈 준비가 되어 있으시군요. 다만 달에 가기 전 <em>지구 중력(규제 리스크)</em>이 한 번쯤 당신을 잡아당길 수 있습니다.`,
+];
+
+// Scores: [예적금, 현금, 채권, 금, 배당주, 대형주, 성장주, ETF, 레버리지ETF, 비트코인]
+const QUESTIONS = [
+  {
+    emoji:'💰', q:'Q1. 길 가다 1억을 주웠다. 당신의 본능은?',
+    opts:[
+      { t:`일단 은행 앱부터 켜서 '예금' 금리 검색, 내 원금은 소중하니까.`,   s:[3,0,0,0,0,0,0,0,0,0] },
+      { t:'일단 현금 통장에 박아두고, 내일의 내가 고민하게 한다.',           s:[0,3,0,0,0,0,0,0,0,0] },
+      { t:'국가가 망하지 않는 이상 안전한 곳으로. 수익은 소소하게.',          s:[0,0,3,0,0,0,0,0,0,0] },
+      { t:'종이 쪼가리는 못 믿어. 실물 금괴를 사러 갈 거다.',                s:[0,0,0,3,0,0,0,0,0,0] },
+      { t:`오늘 밤을 즐기자! 내일은 없는 것처럼 화끈한 곳에 올인.`,           s:[0,0,0,0,0,0,0,0,2,1] },
+    ]
+  },
+  {
+    emoji:'📉', q:'Q2. 시장이 -30% 폭락했다. 당신의 멘탈은?',
+    opts:[
+      { t:'이미 계좌 안 본 지 오래됨. 내 마음의 평화가 최고.',               s:[3,0,0,0,0,0,0,0,0,0] },
+      { t:'추가 하락에 대비해 현금을 확보한다. 줍줍 기회!',                   s:[0,2,0,1,0,0,0,0,0,0] },
+      { t:'이럴 때일수록 안전자산이지, 든든하게 버틴다.',                     s:[0,0,1,2,0,0,0,0,0,0] },
+      { t:'배당금이나 들어오면 좋겠다. 멍하니 차트 구경 중.',                  s:[0,0,0,0,3,0,0,0,0,0] },
+      { t:'2배 아니면 3배로 복구한다. 지금이 기회다!',                        s:[0,0,0,0,0,0,0,0,3,0] },
+    ]
+  },
+  {
+    emoji:'🧠', q:`Q3. '투자'하면 가장 먼저 떠오르는 이미지는?`,
+    opts:[
+      { t:'전 세계가 다 아는 1등 기업 주식, 실패가 없지.',                   s:[0,0,0,0,0,3,0,0,0,0] },
+      { t:'10년 뒤 세상을 바꿀 미친 기술에 거는 배팅.',                      s:[0,0,0,0,0,0,3,0,0,0] },
+      { t:'남들 다 하는 평균만큼은 벌어야지, 복잡한 건 싫어.',                s:[0,0,0,0,0,0,0,3,0,0] },
+      { t:'기존 금융 시스템은 낡았어. 미래의 디지털 자산이 답이다.',            s:[0,0,0,0,0,0,0,0,0,3] },
+      { t:'따박따박 월세처럼 들어오는 수익이 최고지.',                         s:[0,0,0,0,3,0,0,0,0,0] },
+    ]
+  },
+  {
+    emoji:'📺', q:'Q4. 투자 유튜브, 내가 구독 버튼을 누르는 채널은?',
+    opts:[
+      { t:'은행별 금리 비교, 요즘 어디가 제일 높나? — 실용 재테크 채널.',      s:[2,0,0,0,0,0,0,0,0,0] },
+      { t:'배당주 포트 구축 & 배당 재투자 10년 기록 채널.',                   s:[0,0,0,0,2,0,0,0,0,0] },
+      { t:'ETF 장기 투자 20년 복리 시뮬레이션 채널.',                        s:[0,0,0,0,0,0,0,2,0,0] },
+      { t:'AI·반도체·바이오 성장주 발굴 & 급등주 선정 채널.',                  s:[0,0,0,0,0,0,2,0,0,0] },
+      { t:'레버리지 ETF 단타 극한 수익 전략 채널. 심장이 뛴다.',               s:[0,0,0,0,0,0,0,0,2,0] },
+      { t:'비트코인 온체인 분석 & 코인 시황 예측 채널.',                       s:[0,0,0,0,0,0,0,0,0,2] },
+    ]
+  },
+  {
+    emoji:'💸', q:'Q5. 월급날, 당신이 가장 먼저 하는 행동은?',
+    opts:[
+      { t:'자동이체로 정기적금 이체 완료. 습관이 곧 재산이다.',                s:[2,0,0,0,0,0,0,0,0,0] },
+      { t:'생활비 제외 나머지는 일단 통장에 쌓는다. 내일의 내가 결정.',         s:[0,2,0,0,0,0,0,0,0,0] },
+      { t:'이번 달 배당 입금 일정 확인 후, 배당주 추가 매수.',                 s:[0,0,0,0,2,0,0,0,0,0] },
+      { t:'글로벌 ETF 자동 적립 확인. 클릭 한 번이면 끝.',                    s:[0,0,0,0,0,0,0,2,0,0] },
+      { t:'관심 성장주 실적 발표 일정 체크 후 매수 여부 결정.',                 s:[0,0,0,0,0,0,2,0,0,0] },
+      { t:'코인 시세 먼저 확인. 오늘도 HODLing 유지 중.',                    s:[0,0,0,0,0,0,0,0,0,2] },
+    ]
+  },
+  {
+    emoji:'⚠️', q:'Q6. 경기 침체 뉴스가 터졌다. 나의 행동 계획은?',
+    opts:[
+      { t:'고금리 정기예금 노릴 타이밍! 지금이 기회다.',                      s:[2,0,0,0,0,0,0,0,0,0] },
+      { t:'현금 비중 최대화. 현금이 곧 방패다.',                              s:[0,2,0,0,0,0,0,0,0,0] },
+      { t:'위기 때 빛나는 금. 지금 담아야지.',                                s:[0,0,0,2,0,0,0,0,0,0] },
+      { t:'우량 배당주 물타기. 배당률이 올라가니 오히려 좋아.',                 s:[0,0,0,0,2,0,0,0,0,0] },
+      { t:'대형 우량주를 지금 싸게 살 최고의 찬스다.',                         s:[0,0,0,0,0,2,0,0,0,0] },
+      { t:'이런 거 모르겠고, ETF 꾸준히 자동 적립.',                          s:[0,0,0,0,0,0,0,2,0,0] },
+    ]
+  },
+  {
+    emoji:'🗣️', q:'Q7. 친구가 "○○ 투자로 한 달에 2배 벌었다"고 자랑할 때 속마음은?',
+    opts:[
+      { t:'부럽지만... 원금 보장은 돼? 역시 예금이 최고야.',                  s:[2,0,0,0,0,0,0,0,0,0] },
+      { t:'현금 비중은 얼마야? 리스크 관리는 되고 있어?',                      s:[0,1,1,0,0,0,0,0,0,0] },
+      { t:'어떤 종목이야? 대형주면 나도 분석해볼게.',                          s:[0,0,0,0,0,2,0,0,0,0] },
+      { t:'어떤 성장주야? 나도 들어가야 하는 건 아닌지.',                       s:[0,0,0,0,0,0,2,0,0,0] },
+      { t:'레버리지로 들어갔으면 4배였겠네. 아깝다.',                          s:[0,0,0,0,0,0,0,0,2,0] },
+      { t:'코인 아닌가? 코인이면 나도 알 것 같은데.',                          s:[0,0,0,0,0,0,0,0,0,2] },
+    ]
+  },
+  {
+    emoji:'🏠', q:'Q8. 드디어 내 집 마련! 남은 여윳돈으로 뭐 할래?',
+    opts:[
+      { t:'주택담보대출 조기 상환. 이게 최고 수익률이지.',                     s:[2,0,1,0,0,0,0,0,0,0] },
+      { t:'안전한 채권형 자산 비중 늘리기. 이제 지킬 게 생겼으니.',             s:[0,0,2,0,0,0,0,0,0,0] },
+      { t:'금 조금씩 사서 안전 자산으로 비축하기.',                            s:[0,0,0,2,0,0,0,0,0,0] },
+      { t:'배당 포트폴리오 구축. 목표는 월 배당 300만원.',                     s:[0,0,0,0,3,0,0,0,0,0] },
+      { t:'S&P500 ETF 꾸준히 적립. 30년 복리의 힘을 믿는다.',                s:[0,0,0,0,0,0,0,3,0,0] },
+      { t:'비트코인 HODL. 30년 뒤엔 금을 대체할 테니.',                       s:[0,0,0,0,0,0,0,0,0,3] },
+    ]
+  },
+  {
+    emoji:'🌙', q:'Q9. 내가 가장 편안하게 잠드는 밤은?',
+    opts:[
+      { t:'이번 달 이자 입금 알림이 온 날.',                                 s:[2,0,0,0,0,0,0,0,0,0] },
+      { t:'현금 잔고가 충분히 쌓인 걸 확인한 날.',                            s:[0,2,0,0,0,0,0,0,0,0] },
+      { t:'폭락장에서 내 안전자산이 방어해 준 날.',                            s:[0,0,1,1,0,0,0,0,0,0] },
+      { t:'배당금이 통장에 들어온 날.',                                        s:[0,0,0,0,2,0,0,0,0,0] },
+      { t:'ETF 수익률이 착착 우상향으로 쌓이는 걸 본 날.',                     s:[0,0,0,0,0,0,0,2,0,0] },
+      { t:'코인이 폭등해서 평가자산 +50% 찍힌 날. (내일은 몰라도)',            s:[0,0,0,0,0,0,0,0,1,1] },
+    ]
+  },
+  {
+    emoji:'🧭', q:'Q10. 나를 가장 잘 설명하는 투자 철학 한 마디는?',
+    opts:[
+      { t:`"잃지 않는 것이 버는 것이다." — 원금 보장 최우선.`,                s:[2,0,1,0,0,0,0,0,0,0] },
+      { t:`"실물 자산만이 진짜 자산이다." — 종이 자산은 믿지 않아.`,           s:[0,0,0,3,0,0,0,0,0,0] },
+      { t:`"배당이 쌓이면 결국 이긴다." — 느리지만 확실하게.`,                 s:[0,0,0,0,2,0,0,1,0,0] },
+      { t:`"시장 평균이면 충분하다." — 복잡한 건 사절.`,                       s:[0,0,0,0,0,1,0,2,0,0] },
+      { t:`"10배 아니면 의미 없다." — 크게 베팅해야 크게 먹는다.`,             s:[0,0,0,0,0,0,2,0,1,0] },
+      { t:`"코드가 금을 대체한다." — 디지털 자산이 미래다.`,                   s:[0,0,0,0,0,0,0,0,0,3] },
+    ]
+  },
+];
+
+/* ══════════════════════════════════════
+   TICKER
+══════════════════════════════════════ */
+const TICKS = [
+  {s:'AAPL',p:'188.42',c:'+1.2%',u:true},{s:'TSLA',p:'254.17',c:'+5.9%',u:true},
+  {s:'BTC',p:'68,420',c:'+3.4%',u:true},{s:'NVDA',p:'892.40',c:'+3.7%',u:true},
+  {s:'KO',p:'61.34',c:'+0.4%',u:true},{s:'GME',p:'18.33',c:'-2.3%',u:false},
+  {s:'SPY',p:'524.17',c:'+0.7%',u:true},{s:'QQQ',p:'448.52',c:'+1.1%',u:true},
+  {s:'GLD',p:'223.40',c:'+0.9%',u:true},{s:'SOXL',p:'38.77',c:'-1.8%',u:false},
+];
+(function initTicker(){
+  const el=document.getElementById('ticker');
+  const items=[...TICKS,...TICKS];
+  el.innerHTML=items.map(t=>`
+    <span class="tick-item">
+      <span style="color:#e8edf5;font-weight:600">${t.s}</span>
+      <span class="${t.u?'tick-up':'tick-dn'}">${t.p}</span>
+      <span class="${t.u?'tick-up':'tick-dn'}">${t.c}</span>
+    </span>`).join('');
+  let x=0;
+  function scroll(){x+=0.5; if(x>el.scrollWidth/2)x=0; el.style.transform=`translateX(-${x}px)`; requestAnimationFrame(scroll);}
+  scroll();
+})();
+
+/* ══════════════════════════════════════
+   ASSET PREVIEW (INTRO)
+══════════════════════════════════════ */
+(function initAssetPreview(){
+  const el=document.getElementById('assetPreview');
+  el.innerHTML=ASSETS.map(a=>`
+    <div class="ap-chip">
+      <div class="ico">${a.emoji}</div>
+      <div class="nm" style="color:${a.color}">${a.name}</div>
+    </div>`).join('');
+})();
+
+/* ══════════════════════════════════════
+   QUIZ LOGIC
+══════════════════════════════════════ */
+let scores=[0,0,0,0,0,0,0,0,0,0];
+let curQ=0;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startQuiz(){
+  scores=[0,0,0,0,0,0,0,0,0,0];
+  curQ=0;
+  showScreen('s-quiz');
+  renderQ();
+}
+
+function renderQ(){
+  const q=QUESTIONS[curQ];
+  const ALPHA=['A','B','C','D','E','F'];
+
+  document.getElementById('qNum').textContent=`Q.${String(curQ+1).padStart(2,'0')}`;
+  document.getElementById('qText').innerHTML=`<span class="q-emoji">${q.emoji}</span>${q.q}`;
+  document.getElementById('qLabel').textContent=`Q ${curQ+1} / 10`;
+  const pct=Math.round((curQ/10)*100);
+  document.getElementById('qPct').textContent=`${pct}%`;
+  document.getElementById('qFill').style.width=`${pct}%`;
+
+  // Restart animation
+  const card=document.querySelector('.q-card');
+  card.style.animation='none'; card.offsetHeight;
+  card.style.animation='screenIn 0.4s ease both';
+
+  const list=document.getElementById('optsList');
+  list.innerHTML=q.opts.map((o,i)=>`
+    <button class="opt-btn" onclick="pickOpt(${i},this)">
+      <span class="opt-key">${ALPHA[i]}</span>
+      <span>${o.t}</span>
+    </button>`).join('');
+}
+
+function pickOpt(idx,btn){
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  btn.classList.add('picked');
+
+  const q=QUESTIONS[curQ];
+  q.opts[idx].s.forEach((v,i)=>{ scores[i]+=v; });
+
+  // Particle
+  spawnParticle(ASSETS[q.opts[idx].s.indexOf(Math.max(...q.opts[idx].s))].emoji, btn);
+
+  setTimeout(()=>{
+    curQ++;
+    if(curQ<QUESTIONS.length) renderQ();
+    else doLoading();
+  }, 400);
+}
+
+function spawnParticle(emoji,el){
+  const p=document.createElement('div');
+  p.textContent=emoji;
+  const r=el.getBoundingClientRect();
+  Object.assign(p.style,{
+    position:'fixed', left:`${r.left+Math.random()*80}px`, top:`${r.top-10}px`,
+    fontSize:'20px', zIndex:'999', pointerEvents:'none',
+    animation:'floatUp 1.2s ease-out forwards'
+  });
+  document.body.appendChild(p);
+  if(!document.getElementById('float-style')){
+    const st=document.createElement('style');
+    st.id='float-style';
+    st.textContent='@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-80px)}}';
+    document.head.appendChild(st);
+  }
+  setTimeout(()=>p.remove(),1200);
+}
+
+/* ══════════════════════════════════════
+   LOADING
+══════════════════════════════════════ */
+let lastPortfolio=null;
+
+function doLoading(){
+  showScreen('s-loading');
+  ['ls1','ls2','ls3','ls4'].forEach((id,i)=>{
+    setTimeout(()=>document.getElementById(id).classList.add('done'), 500*(i+1));
+  });
+  setTimeout(()=>showResult(), 2800);
+}
+
+/* ══════════════════════════════════════
+   RESULT
+══════════════════════════════════════ */
+let donutChart=null;
+
+function showResult(){
+  showScreen('s-result');
+
+  const total=scores.reduce((a,b)=>a+b,0)||1;
+  const pcts=scores.map(s=>Math.round((s/total)*100));
+
+  // Fix rounding to 100%
+  const diff=100-pcts.reduce((a,b)=>a+b,0);
+  const maxIdx=pcts.indexOf(Math.max(...pcts));
+  pcts[maxIdx]+=diff;
+
+  // Sort by pct desc
+  const ranked=ASSETS.map((a,i)=>({...a,pct:pcts[i],idx:i}))
+    .filter(a=>a.pct>0)
+    .sort((a,b)=>b.pct-a.pct);
+
+  // Store for capture
+  lastPortfolio={ranked, pcts};
+
+  // Center text
+  const top=ranked[0];
+  document.getElementById('centerPct').textContent=`${top.pct}%`;
+  document.getElementById('centerPct').style.color=top.color;
+  document.getElementById('centerName').textContent=top.name;
+
+  // Title/sub
+  const riskScore=pcts[8]*3+pcts[9]*3+pcts[6]*2+pcts[5]; // 레버리지+BTC+성장+대형
+  const riskLabel=riskScore>30?'공격형':riskScore>15?'중립형':'방어형';
+  document.getElementById('resTitle').textContent=`당신의 ${riskLabel} 포트폴리오`;
+  document.getElementById('resSub').textContent=`상위 자산: ${ranked.slice(0,3).map(r=>r.name).join(', ')} — 팩트 폭격이 기다리고 있습니다.`;
+
+  // Chart
+  buildChart(ranked);
+
+  // Legend
+  buildLegend(ranked);
+
+  // Roast
+  buildRoast(ranked.slice(0,3));
+}
+
+function buildChart(ranked){
+  if(donutChart){ donutChart.destroy(); donutChart=null; }
+  const ctx=document.getElementById('donutChart').getContext('2d');
+  donutChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:ranked.map(r=>r.name),
+      datasets:[{
+        data:ranked.map(r=>r.pct),
+        backgroundColor:ranked.map(r=>r.color),
+        borderColor:'#04070f',
+        borderWidth:3,
+        hoverBorderWidth:4,
+      }]
+    },
+    options:{
+      responsive:false,
+      cutout:'68%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:(ctx)=>`  ${ctx.label}: ${ctx.raw}%`
+          },
+          backgroundColor:'rgba(4,7,15,0.9)',
+          borderColor:'rgba(255,255,255,0.1)',
+          borderWidth:1,
+          titleFont:{family:'JetBrains Mono', size:12},
+          bodyFont:{family:'JetBrains Mono', size:12},
+          padding:10,
+        }
+      },
+      animation:{
+        duration:1200,
+        easing:'easeInOutQuart'
+      }
+    }
+  });
+}
+
+function buildLegend(ranked){
+  const el=document.getElementById('legendList');
+  el.innerHTML=ranked.map(r=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${r.color}"></div>
+      <span class="legend-name">${r.emoji} ${r.name}</span>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar" style="width:${r.pct}%; background:${r.color};"></div>
+      </div>
+      <span class="legend-pct" style="color:${r.color}">${r.pct}%</span>
+    </div>`).join('');
+}
+
+function buildRoast(top3){
+  const rankLabels=['🥇 1위 비중','🥈 2위 비중','🥉 3위 비중'];
+  const el=document.getElementById('roastCards');
+  el.innerHTML=top3.map((a,ri)=>`
+    <div class="roast-card" style="border-color:${a.color}22">
+      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${a.color};border-radius:14px 0 0 14px;"></div>
+      <div class="roast-rank" style="color:${a.color}">${rankLabels[ri]} · ${a.name.toUpperCase()}</div>
+      <div class="roast-header">
+        <span class="roast-emoji">${a.emoji}</span>
+        <span class="roast-asset-name">${a.name}</span>
+        <span class="roast-asset-pct" style="color:${a.color}">${a.pct}%</span>
+      </div>
+      <div class="roast-text">${ROASTS[a.idx](a.pct)}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   CAPTURE
+══════════════════════════════════════ */
+async function captureResult(){
+  if(!lastPortfolio) return;
+  const btn=document.getElementById('btnCapture');
+  btn.classList.add('saving');
+  btn.innerHTML='⏳ &nbsp;생성 중...';
+
+  const {ranked}=lastPortfolio;
+  const top3=ranked.slice(0,3);
+
+  // Convert chart canvas to image
+  const chartCanvas=document.getElementById('donutChart');
+  const chartImg=chartCanvas.toDataURL('image/png');
+
+  // Build capture card
+  const card=document.getElementById('capture-card');
+  const legendHtml=ranked.map(r=>`
+    <div class="cap-leg-row">
+      <div class="cap-leg-dot" style="background:${r.color}"></div>
+      <span class="cap-leg-name">${r.emoji} ${r.name}</span>
+      <span class="cap-leg-pct" style="color:${r.color}">${r.pct}%</span>
+    </div>`).join('');
+
+  // Strip HTML tags for capture card
+  const strip=(html)=>html.replace(/<em>/g,'').replace(/<\/em>/g,'');
+
+  const roastHtml=top3.map((a,ri)=>`
+    <div class="cap-roast-item">
+      <div class="cap-roast-head">
+        <span style="font-size:15px">${a.emoji}</span>
+        <span class="cap-roast-name" style="color:${a.color}">${a.name}</span>
+        <span class="cap-roast-pct" style="color:${a.color}">${a.pct}%</span>
+      </div>
+      <div class="cap-roast-txt">${strip(ROASTS[a.idx](a.pct))}</div>
+    </div>`).join('');
+
+  card.innerHTML=`
+    <div class="cap-header">
+      <span class="cap-logo">💹 금융 DNA 포트폴리오 테스트</span>
+      <span class="cap-ep">FACT BOMBER EDITION</span>
+    </div>
+    <div class="cap-top-title">내 금융 DNA 포트폴리오</div>
+    <div class="cap-top-sub">PORTFOLIO BALANCE · ${ranked.slice(0,3).map(r=>r.name).join(' / ')}</div>
+    <div class="cap-body">
+      <img class="cap-chart-img" src="${chartImg}" alt="chart">
+      <div class="cap-legend">${legendHtml}</div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-analysis-title">FACT BOMB REPORT · TOP 3 ANALYSIS</div>
+    ${roastHtml}
+    <div class="cap-footer">금융 DNA 포트폴리오 밸런스 테스트 · 팩트 폭격기 에디션 | 실제 투자 권유가 아닙니다.</div>
+  `;
+
+  await new Promise(r=>setTimeout(r,300));
+
+  try{
+    const canvas=await html2canvas(card,{
+      scale:2,
+      backgroundColor:'#070c18',
+      useCORS:true,
+      logging:false,
+      width:560,
+      windowWidth:560
+    });
+
+    canvas.toBlob(async(blob)=>{
+      const fname='금융DNA_포트폴리오.png';
+
+      if(navigator.share && navigator.canShare){
+        const file=new File([blob],fname,{type:'image/png'});
+        const sd={files:[file],title:'내 금융 DNA 포트폴리오',text:`나의 포트폴리오 1위는 ${ranked[0].name} (${ranked[0].pct}%)!`};
+        try{
+          if(navigator.canShare(sd)){ await navigator.share(sd); resetBtn(btn); return; }
+        }catch(e){}
+      }
+
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=fname;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+      btn.innerHTML='✅ &nbsp;저장 완료!';
+      setTimeout(()=>resetBtn(btn),2000);
+    },'image/png');
+
+  }catch(e){
+    console.error(e);
+    resetBtn(btn);
+    alert('캡처 실패. 스크린샷을 이용해 주세요.');
+  }
+}
+
+function resetBtn(btn){
+  btn.classList.remove('saving');
+  btn.innerHTML='📸 &nbsp;내 금융 DNA 캡처하기';
+}
+
+function restartQuiz(){
+  showScreen('s-intro');
+}
+</script>
+</body>
+</html>
